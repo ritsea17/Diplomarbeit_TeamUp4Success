@@ -1,4 +1,5 @@
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
+import 'package:explore/utils/authentication.dart';
 import 'package:explore/widgets/web_scrollbar.dart';
 import 'package:explore/widgets/explore_drawer.dart';
 import 'package:explore/widgets/responsive.dart';
@@ -77,22 +78,39 @@ class _HomePageState extends State<HomePage> {
             children: [
               Stack(
                 children: [
-                  Container(
+                  Center(
                     child: SizedBox(
-                      height: screenSize.height,
+                      height: screenSize.height*0.5,
                       width: screenSize.width,
                       child: Image.asset(
                         'assets/images/bild123.jpg',
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fill,
                       ),
                     ),
+
                   ),
-                ],
+                 ],
+                    ),
+
+              Text(
+                'Anmeldedaten',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 25,
+                  fontFamily: 'Montserrat',
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 3,
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
+     ],
+
+    ),
+
+
+    ),
+    ),
+
+
     );
   }
 }

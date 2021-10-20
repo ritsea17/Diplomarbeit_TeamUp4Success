@@ -1,15 +1,15 @@
 import 'package:explore/screens/home_page.dart';
 import 'package:explore/utils/authentication.dart';
-import 'package:explore/widgets/Register.dart';
+import 'package:explore/widgets/auth_dialog.dart';
 import 'package:flutter/material.dart';
 
 
-class AuthDialog extends StatefulWidget {
+class RegisterDialog extends StatefulWidget {
   @override
   _AuthDialogState createState() => _AuthDialogState();
 }
 
-class _AuthDialogState extends State<AuthDialog> {
+class _AuthDialogState extends State<RegisterDialog> {
   late TextEditingController textControllerEmail;
   late FocusNode textFocusNodeEmail;
   bool _isEditingEmail = false;
@@ -17,6 +17,10 @@ class _AuthDialogState extends State<AuthDialog> {
   late TextEditingController textControllerPassword;
   late FocusNode textFocusNodePassword;
   bool _isEditingPassword = false;
+
+  late TextEditingController textControllerBenutzername;
+  late FocusNode textFocusNodeBenutzername;
+  bool _isEditingBenutzername = false;
 
   bool _isRegistering = false;
   bool _isLoggingIn = false;
@@ -43,6 +47,10 @@ class _AuthDialogState extends State<AuthDialog> {
 
     return null;
   }
+  String? _validateBenutzername(String value) {
+    value = value.trim();
+    return null;
+  }
 
   String? _validatePassword(String value) {
     value = value.trim();
@@ -62,10 +70,13 @@ class _AuthDialogState extends State<AuthDialog> {
   void initState() {
     textControllerEmail = TextEditingController();
     textControllerPassword = TextEditingController();
+    textControllerBenutzername = TextEditingController();
     textControllerEmail.text = '';
     textControllerPassword.text = '';
+    textControllerBenutzername.text = '';
     textFocusNodeEmail = FocusNode();
     textFocusNodePassword = FocusNode();
+    textFocusNodeBenutzername = FocusNode();
     super.initState();
   }
 
@@ -89,15 +100,15 @@ class _AuthDialogState extends State<AuthDialog> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Center(
-                    child: SizedBox(
-                      height: screenSize.height*0.12,
-                      width: screenSize.width*0.08,
+                  child: SizedBox(
+                    height: screenSize.height*0.12,
+                    width: screenSize.width*0.08,
 
-                      child: Image.asset(
-                        'assets/images/Logo.png',
-                        fit: BoxFit.fill,
-                      ),
+                    child: Image.asset(
+                      'assets/images/Logo.png',
+                      fit: BoxFit.fill,
                     ),
+                  ),
                 ),
                 Center(
 
@@ -109,6 +120,65 @@ class _AuthDialogState extends State<AuthDialog> {
                       fontFamily: 'Montserrat',
                       fontWeight: FontWeight.bold,
                       letterSpacing: 3,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 20.0,
+                    bottom: 8,
+                  ),
+                  child: Text(
+                    'Benutzername:',
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: Theme.of(context).textTheme.subtitle2!.color,
+                      fontSize: 18,
+                      // fontFamily: 'Montserrat',
+                      fontWeight: FontWeight.bold,
+                      // letterSpacing: 3,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 20.0,
+                    right: 20,
+                  ),
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        _isEditingBenutzername = true;
+                      });
+                    },
+                    onSubmitted: (value) {
+                      textFocusNodeBenutzername.unfocus();
+                      FocusScope.of(context)
+                          .requestFocus(textFocusNodeEmail);
+                    },
+                    style: TextStyle(color: Colors.black),
+                    decoration: InputDecoration(
+                      border: new OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.blueGrey[800]!,
+                          width: 3,
+                        ),
+                      ),
+                      filled: true,
+                      hintStyle: new TextStyle(
+                        color: Colors.blueGrey[300],
+                      ),
+                      hintText: "xyz",
+                      fillColor: Colors.white,
+                      errorText: _isEditingBenutzername
+                          ? _validateBenutzername(textControllerBenutzername.text)
+                          : null,
+                      errorStyle: TextStyle(
+                        fontSize: 12,
+                        color: Colors.redAccent,
+                      ),
                     ),
                   ),
                 ),
@@ -250,12 +320,6 @@ class _AuthDialogState extends State<AuthDialog> {
                         flex: 1,
                         child: Container(
                           width: double.maxFinite,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: Colors.blueGrey[800]!,
-                                width: 1,
-                              )),
                           child: TextButton(
                             style: TextButton.styleFrom(
                               primary: Colors.purple,
@@ -270,42 +334,42 @@ class _AuthDialogState extends State<AuthDialog> {
                                 textFocusNodePassword.unfocus();
                               });
                               if (_validateEmail(textControllerEmail.text) ==
-                                      null &&
+                                  null &&
                                   _validatePassword(
-                                          textControllerPassword.text) ==
+                                      textControllerPassword.text) ==
                                       null) {
                                 await signInWithEmailPassword(
-                                        textControllerEmail.text,
-                                        textControllerPassword.text)
+                                    textControllerEmail.text,
+                                    textControllerPassword.text)
                                     .then((result) {
                                   if (result != null) {
                                     print(result);
                                     setState(() {
                                       loginStatus =
-                                          'Du hast dich erfolgreich angemeldet!';
+                                      'You have successfully logged in';
                                       loginStringColor = Colors.green;
                                     });
                                     Future.delayed(Duration(milliseconds: 500),
-                                        () {
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context)
-                                          .pushReplacement(MaterialPageRoute(
-                                        fullscreenDialog: true,
-                                        builder: (context) => HomePage(),
-                                      ));
-                                    });
+                                            () {
+                                          Navigator.of(context).pop();
+                                          Navigator.of(context)
+                                              .pushReplacement(MaterialPageRoute(
+                                            fullscreenDialog: true,
+                                            builder: (context) => HomePage(),
+                                          ));
+                                        });
                                   }
                                 }).catchError((error) {
                                   print('Login Error: $error');
                                   setState(() {
                                     loginStatus =
-                                        'Error';
+                                    'Error occured while logging in';
                                     loginStringColor = Colors.red;
                                   });
                                 });
                               } else {
                                 setState(() {
-                                  loginStatus = 'Bitte gib E-Mail & Password ein';
+                                  loginStatus = 'Please enter email & password';
                                   loginStringColor = Colors.red;
                                 });
                               }
@@ -324,65 +388,74 @@ class _AuthDialogState extends State<AuthDialog> {
                               ),
                               child: _isLoggingIn
                                   ? SizedBox(
-                                      height: 16,
-                                      width: 16,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            new AlwaysStoppedAnimation<Color>(
-                                          Colors.white,
-                                        ),
-                                      ),
-                                    )
+                                height: 16,
+                                width: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor:
+                                  new AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
                                   : Text(
-                                      'Anmelden',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                      ),
-                                    ),
+                                'Anmelden',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
+                      SizedBox(width: 20),
                       Flexible(
                         flex: 1,
                         child: Container(
                           width: double.maxFinite,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: Colors.blueGrey[800]!,
-                                width: 1,
-                              )),
                           child: TextButton(
                             style: TextButton.styleFrom(
                               primary: Colors.purple,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0),
+                                borderRadius: BorderRadius.circular(15),
                               ),
                             ),
                             onPressed: () async {
-                              showDialog(
-                                context: context,
-                                builder: (context) => RegisterDialog(),
-                              );
+                              setState(() {
+                                _isRegistering = true;
+                              });
+                              await registerWithEmailPassword(
+                                  textControllerEmail.text,
+                                  textControllerPassword.text)
+                                  .then((result) {
+                                if (result != null) {
+                                  setState(() {
+                                    loginStatus =
+                                    'You have registered successfully';
+                                    loginStringColor = Colors.green;
+                                  });
+                                  print(result);
+                                }
+                              }).catchError((error) {
+                                print('Registration Error: $error');
+                                setState(() {
+                                  loginStatus =
+                                  'Error occured while registering';
+                                  loginStringColor = Colors.red;
+                                });
+                              });
+
+                              setState(() {
+                                _isRegistering = false;
+                              });
                             },
                             child: Padding(
                               padding: EdgeInsets.only(
                                 top: 15.0,
                                 bottom: 15.0,
                               ),
-                              child: _isLoggingIn
+                              child: _isRegistering
                                   ? SizedBox(
                                 height: 16,
                                 width: 16,
@@ -410,20 +483,20 @@ class _AuthDialogState extends State<AuthDialog> {
                 ),
                 loginStatus != null
                     ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            bottom: 20.0,
-                          ),
-                          child: Text(
-                            loginStatus!,
-                            style: TextStyle(
-                              color: loginStringColor,
-                              fontSize: 14,
-                              // letterSpacing: 3,
-                            ),
-                          ),
-                        ),
-                      )
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: 20.0,
+                    ),
+                    child: Text(
+                      loginStatus!,
+                      style: TextStyle(
+                        color: loginStringColor,
+                        fontSize: 14,
+                        // letterSpacing: 3,
+                      ),
+                    ),
+                  ),
+                )
                     : Container(),
                 Padding(
                   padding: const EdgeInsets.only(
@@ -437,11 +510,10 @@ class _AuthDialogState extends State<AuthDialog> {
                   ),
                 ),
                 SizedBox(height: 30),
-                SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    'Wilkommen bei TeamUp4Success',
+                    'Willkommen bei TeamUp4Success',
                     maxLines: 2,
                     style: TextStyle(
                       color: Theme.of(context).textTheme.subtitle2!.color,

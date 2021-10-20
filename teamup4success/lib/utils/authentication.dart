@@ -36,67 +36,7 @@ Future getUser() async {
 /// with Firebase Authentication API.
 ///
 /// Retrieves some general user related information
-/// from their Google account for ease of the login process
-Future<User?> signInWithGoogle() async {
-  await Firebase.initializeApp();
 
-  User? user;
-
-  if (kIsWeb) {
-    GoogleAuthProvider authProvider = GoogleAuthProvider();
-
-    try {
-      final UserCredential userCredential =
-          await _auth.signInWithPopup(authProvider);
-
-      user = userCredential.user;
-    } catch (e) {
-      print(e);
-    }
-  } else {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-
-    final GoogleSignInAccount? googleSignInAccount =
-        await googleSignIn.signIn();
-
-    if (googleSignInAccount != null) {
-      final GoogleSignInAuthentication googleSignInAuthentication =
-          await googleSignInAccount.authentication;
-
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleSignInAuthentication.accessToken,
-        idToken: googleSignInAuthentication.idToken,
-      );
-
-      try {
-        final UserCredential userCredential =
-            await _auth.signInWithCredential(credential);
-
-        user = userCredential.user;
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'account-exists-with-different-credential') {
-          print('The account already exists with a different credential.');
-        } else if (e.code == 'invalid-credential') {
-          print('Error occurred while accessing credentials. Try again.');
-        }
-      } catch (e) {
-        print(e);
-      }
-    }
-  }
-
-  if (user != null) {
-    uid = user.uid;
-    name = user.displayName;
-    userEmail = user.email;
-    imageUrl = user.photoURL;
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('auth', true);
-  }
-
-  return user;
-}
 
 Future<User?> registerWithEmailPassword(String email, String password) async {
   await Firebase.initializeApp();

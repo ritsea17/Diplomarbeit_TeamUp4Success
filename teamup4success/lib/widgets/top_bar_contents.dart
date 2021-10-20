@@ -1,6 +1,7 @@
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:explore/screens/home_page.dart';
 import 'package:explore/utils/authentication.dart';
+import 'package:explore/widgets/Register.dart';
 import 'package:explore/widgets/auth_dialog.dart';
 import 'package:flutter/material.dart';
 
@@ -53,8 +54,8 @@ class _TopBarContentsState extends State<TopBarContents> {
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(width: screenSize.width / 8),
+                    children: [
+                      SizedBox(width: screenSize.width / 8),
                     InkWell(
                       onHover: (value) {
                         setState(() {
@@ -193,7 +194,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                     : null,
                 child: userEmail == null
                     ? Text(
-                        'Anmdelden',
+                        'Anmelden',
                         style: TextStyle(
                           color: _isHovering[3] ? Colors.black : Colors.white60,
                         ),
@@ -261,7 +262,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                                       'Abmelden',
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: Colors.blueGrey,
+                                        color: Colors.black,
                                       ),
                                     ),
                             ),
@@ -269,10 +270,11 @@ class _TopBarContentsState extends State<TopBarContents> {
                         ],
                       ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+
+                  ],
+                ),
+              ),
+      ));
+
   }
 }

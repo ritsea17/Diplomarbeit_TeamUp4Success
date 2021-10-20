@@ -19,7 +19,7 @@ class _ExploreDrawerState extends State<ExploreDrawer> {
   Widget build(BuildContext context) {
     return Drawer(
       child: Container(
-        color: Theme.of(context).bottomAppBarColor,
+        color: Colors.purple,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -68,13 +68,13 @@ class _ExploreDrawerState extends State<ExploreDrawer> {
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         CircleAvatar(
-                          radius: 20,
+                          radius: 15,
                           backgroundImage:
                               imageUrl != null ? NetworkImage(imageUrl!) : null,
                           child: imageUrl == null
                               ? Icon(
                                   Icons.account_circle,
-                                  size: 40,
+                                  size: 30,
                                 )
                               : Container(),
                         ),
@@ -83,7 +83,7 @@ class _ExploreDrawerState extends State<ExploreDrawer> {
                           name ?? userEmail!,
                           style: TextStyle(
                             fontSize: 20,
-                            color: Colors.white70,
+                            color: Colors.white60,
                           ),
                         )
                       ],
@@ -136,8 +136,8 @@ class _ExploreDrawerState extends State<ExploreDrawer> {
                               : Text(
                                   'Abmelden',
                                   style: TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.white,
+                                    fontSize: 15,
+                                    color: Colors.white70,
                                   ),
                                 ),
                         ),
@@ -155,14 +155,28 @@ class _ExploreDrawerState extends State<ExploreDrawer> {
               Padding(
                 padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
                 child: Divider(
-                  color: Colors.blueGrey[400],
+                  color: Colors.grey,
                   thickness: 2,
                 ),
               ),
               InkWell(
                 onTap: () {},
                 child: Text(
-                  'Kontaktiere uns',
+                  'Fachauswahl',
+                  style: TextStyle(color: Colors.white, fontSize: 22),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
+                child: Divider(
+                  color: Colors.grey,
+                  thickness: 2,
+                ),
+              ),
+              InkWell(
+                onTap: () {},
+                child: Text(
+                  'Termine',
                   style: TextStyle(color: Colors.white, fontSize: 22),
                 ),
               ),
@@ -172,7 +186,7 @@ class _ExploreDrawerState extends State<ExploreDrawer> {
                   child: Text(
                     'TEAM UP 4 SUCCESS',
                     style: TextStyle(
-                      color: Colors.blueGrey[300],
+                      color: Colors.black,
                       fontSize: 14,
                     ),
                   ),
