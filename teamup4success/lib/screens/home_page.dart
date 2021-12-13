@@ -4,6 +4,7 @@ import 'package:explore/widgets/web_scrollbar.dart';
 import 'package:explore/widgets/explore_drawer.dart';
 import 'package:explore/widgets/responsive.dart';
 import 'package:explore/widgets/top_bar_contents.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -33,6 +34,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    String? userid = uid.toString();
     var screenSize = MediaQuery.of(context).size;
     _opacity = _scrollPosition < screenSize.height * 0.40
         ? _scrollPosition / (screenSize.height * 0.40)
@@ -87,30 +89,14 @@ class _HomePageState extends State<HomePage> {
                         fit: BoxFit.fill,
                       ),
                     ),
-
                   ),
                  ],
                     ),
 
-              Text(
-                'Anmeldedaten',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 25,
-                  fontFamily: 'Montserrat',
-                  fontWeight: FontWeight.w400,
-                  letterSpacing: 3,
-                ),
-              ),
      ],
-
-    ),
-
-
     ),
     ),
-
-
+    ),
     );
   }
 }

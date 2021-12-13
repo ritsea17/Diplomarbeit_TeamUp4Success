@@ -11,6 +11,10 @@ String? uid;
 String? name;
 String? userEmail;
 String? imageUrl;
+String? Abteilung;
+String? Klasse;
+bool? verified;
+String? Password;
 
 /// For checking if the user is already signed into the
 /// app using Google Sign In
@@ -30,6 +34,7 @@ Future getUser() async {
       imageUrl = user.photoURL;
     }
   }
+  return user;
 }
 
 /// For authenticating user using Google Sign In
@@ -49,10 +54,11 @@ Future<User?> registerWithEmailPassword(String email, String password) async {
     );
 
     user = userCredential.user;
-
     if (user != null) {
       uid = user.uid;
       userEmail = user.email;
+      Password = password;
+      user.sendEmailVerification();
     }
   } on FirebaseAuthException catch (e) {
     if (e.code == 'weak-password') {
@@ -64,34 +70,47 @@ Future<User?> registerWithEmailPassword(String email, String password) async {
     print(e);
   }
 
+  user!.sendEmailVerification();
+
   return user;
 }
 
 Future<User?> signInWithEmailPassword(String email, String password) async {
   await Firebase.initializeApp();
   User? user;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  try {
-    UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    user = userCredential.user;
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      user = userCredential.user;
 
-    if (user != null) {
-      uid = user.uid;
-      userEmail = user.email;
+      if (user != null) {
+        uid = user.uid;
+        userEmail = user.email;
+        name = user.displayName;
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('auth', true);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('auth', true);
+        if(user.emailVerified){
+          verified = true;
+        }else
+          {
+            verified = false;
+            user.sendEmailVerification();
+          }
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided.');
+      }
     }
-  } on FirebaseAuthException catch (e) {
-    if (e.code == 'user-not-found') {
-      print('No user found for that email.');
-    } else if (e.code == 'wrong-password') {
-      print('Wrong password provided.');
-    }
-  }
+
+
 
   return user;
 }
@@ -107,3 +126,4 @@ Future<String> signOut() async {
 
   return 'User signed out';
 }
+

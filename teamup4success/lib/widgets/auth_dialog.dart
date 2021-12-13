@@ -1,6 +1,7 @@
 import 'package:explore/screens/home_page.dart';
 import 'package:explore/utils/authentication.dart';
 import 'package:explore/widgets/Register.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 
@@ -10,6 +11,9 @@ class AuthDialog extends StatefulWidget {
 }
 
 class _AuthDialogState extends State<AuthDialog> {
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   late TextEditingController textControllerEmail;
   late FocusNode textFocusNodeEmail;
   bool _isEditingEmail = false;
@@ -23,6 +27,8 @@ class _AuthDialogState extends State<AuthDialog> {
 
   String? loginStatus;
   Color loginStringColor = Colors.green;
+
+  User? user;
 
   String? _validateEmail(String value) {
     value = value.trim();
@@ -56,6 +62,12 @@ class _AuthDialogState extends State<AuthDialog> {
     }
 
     return null;
+  }
+
+  bool _isUserEmailVerified= false;
+
+  bool _verifyEmail(User? user) {
+    return true;
   }
 
   @override
@@ -241,7 +253,12 @@ class _AuthDialogState extends State<AuthDialog> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.only(
+                    left: 20.0,
+                    right: 20,
+                    top:20,
+                    bottom:10
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -268,12 +285,13 @@ class _AuthDialogState extends State<AuthDialog> {
                                 _isLoggingIn = true;
                                 textFocusNodeEmail.unfocus();
                                 textFocusNodePassword.unfocus();
+
                               });
                               if (_validateEmail(textControllerEmail.text) ==
                                       null &&
                                   _validatePassword(
                                           textControllerPassword.text) ==
-                                      null) {
+                                      null ) {
                                 await signInWithEmailPassword(
                                         textControllerEmail.text,
                                         textControllerPassword.text)
@@ -349,7 +367,12 @@ class _AuthDialogState extends State<AuthDialog> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.only(
+                      left: 20.0,
+                      right: 20,
+                      top:20,
+                      bottom:10
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceAround,

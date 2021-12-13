@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/screens/home_page.dart';
 import 'package:explore/utils/authentication.dart';
 import 'package:explore/widgets/auth_dialog.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 
@@ -10,9 +12,19 @@ class RegisterDialog extends StatefulWidget {
 }
 
 class _AuthDialogState extends State<RegisterDialog> {
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final store = FirebaseFirestore.instance;
+  late DocumentReference ref;
+  var itemsList =['Informatik', 'Automatisierung', 'Mechatronik', 'Robotik'];
+  String abteilung = 'Bitte Abteilung auswählen';
   late TextEditingController textControllerEmail;
   late FocusNode textFocusNodeEmail;
   bool _isEditingEmail = false;
+  late String username;
+  late String password;
+  late String abt;
+  late String klasse;
 
   late TextEditingController textControllerPassword;
   late FocusNode textFocusNodePassword;
@@ -21,6 +33,10 @@ class _AuthDialogState extends State<RegisterDialog> {
   late TextEditingController textControllerBenutzername;
   late FocusNode textFocusNodeBenutzername;
   bool _isEditingBenutzername = false;
+
+  late TextEditingController textControllerKlasse;
+  late FocusNode textFocusNodeKlasse;
+  bool _isEditingKlasse = false;
 
   bool _isRegistering = false;
   bool _isLoggingIn = false;
@@ -52,6 +68,12 @@ class _AuthDialogState extends State<RegisterDialog> {
     return null;
   }
 
+  String? _validateKlasse(String value) {
+    value = value.trim();
+    return null;
+  }
+
+
   String? _validatePassword(String value) {
     value = value.trim();
 
@@ -65,18 +87,34 @@ class _AuthDialogState extends State<RegisterDialog> {
 
     return null;
   }
+  bool _isUserEmailVerified= false;
+
+  bool _verifyEmail() {
+
+    final User? user = _auth.currentUser;
+    _isUserEmailVerified = user!.emailVerified;
+    if (_isUserEmailVerified==true) {
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
 
   @override
   void initState() {
     textControllerEmail = TextEditingController();
     textControllerPassword = TextEditingController();
     textControllerBenutzername = TextEditingController();
+    textControllerKlasse = TextEditingController();
     textControllerEmail.text = '';
     textControllerPassword.text = '';
     textControllerBenutzername.text = '';
+    textControllerKlasse.text = '';
     textFocusNodeEmail = FocusNode();
     textFocusNodePassword = FocusNode();
     textFocusNodeBenutzername = FocusNode();
+    textFocusNodeKlasse = FocusNode();
     super.initState();
   }
 
@@ -147,6 +185,11 @@ class _AuthDialogState extends State<RegisterDialog> {
                     right: 20,
                   ),
                   child: TextField(
+                    focusNode: textFocusNodeBenutzername,
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.next,
+                    controller: textControllerBenutzername,
+                    autofocus: false,
                     onChanged: (value) {
                       setState(() {
                         _isEditingBenutzername = true;
@@ -207,7 +250,7 @@ class _AuthDialogState extends State<RegisterDialog> {
                   ),
                   child: TextField(
                     focusNode: textFocusNodeEmail,
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
                     controller: textControllerEmail,
                     autofocus: false,
@@ -283,7 +326,7 @@ class _AuthDialogState extends State<RegisterDialog> {
                     onSubmitted: (value) {
                       textFocusNodePassword.unfocus();
                       FocusScope.of(context)
-                          .requestFocus(textFocusNodePassword);
+                          .requestFocus(textFocusNodeKlasse);
                     },
                     style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
@@ -311,15 +354,125 @@ class _AuthDialogState extends State<RegisterDialog> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.only(
+                    left: 20.0,
+                    bottom: 8,
+                  ),
+                  child: Text(
+                    'Abteilung:',
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: Theme.of(context).textTheme.subtitle2!.color,
+                      fontSize: 18,
+                      // fontFamily: 'Montserrat',
+                      fontWeight: FontWeight.bold,
+                      // letterSpacing: 3,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 20.0,
+                    right: 20,
+                  ),
+                  child:
+                  DropdownButton(
+                    dropdownColor: Colors.white,
+                    focusColor: Colors.purple,
+                    value: abteilung,
+                    onChanged: (String? newValue){
+                     setState((){
+                       abteilung = newValue!;
+                     });
+                     },
+                      items: <String>['Informatik', 'Automatiesierung', 'Mechatronik', 'Robotik']
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      })
+                          .toList(),
+                  ),
+
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 20.0,
+                    bottom: 8,
+                  ),
+                  child: Text(
+                    'Klasse:',
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: Theme.of(context).textTheme.subtitle2!.color,
+                      fontSize: 18,
+                      // fontFamily: 'Montserrat',
+                      fontWeight: FontWeight.bold,
+                      // letterSpacing: 3,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 20.0,
+                    right: 20,
+                  ),
+                  child: TextField(
+                    focusNode: textFocusNodeKlasse,
+                    keyboardType: TextInputType.text,
+                    textInputAction: TextInputAction.done,
+                    controller: textControllerKlasse,
+                    obscureText: false,
+                    autofocus: false,
+                    onChanged: (value) {
+                      setState(() {
+                        _isEditingKlasse = true;
+                      });
+                    },
+                    onSubmitted: (value) {
+                      textFocusNodeKlasse.unfocus();
+                    },
+                    style: TextStyle(color: Colors.black),
+                    decoration: InputDecoration(
+                      border: new OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(
+                          color: Colors.blueGrey[800]!,
+                          width: 3,
+                        ),
+                      ),
+                      filled: true,
+                      hintStyle: new TextStyle(
+                        color: Colors.blueGrey[300],
+                      ),
+                      hintText: "1AHIF",
+                      fillColor: Colors.white,
+                      errorText: _isEditingKlasse
+                          ? _validateKlasse(textControllerBenutzername.text)
+                          : null,
+                      errorStyle: TextStyle(
+                        fontSize: 12,
+                        color: Colors.redAccent,
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Flexible(
                         flex: 1,
                         child: Container(
-                          width: double.maxFinite,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: Colors.blueGrey[800]!,
+                                width: 1,
+                              )),
                           child: TextButton(
                             style: TextButton.styleFrom(
                               primary: Colors.purple,
@@ -332,6 +485,8 @@ class _AuthDialogState extends State<RegisterDialog> {
                                 _isLoggingIn = true;
                                 textFocusNodeEmail.unfocus();
                                 textFocusNodePassword.unfocus();
+                                textFocusNodeBenutzername.unfocus();
+                                textFocusNodeKlasse.unfocus();
                               });
                               if (_validateEmail(textControllerEmail.text) ==
                                   null &&
@@ -342,7 +497,7 @@ class _AuthDialogState extends State<RegisterDialog> {
                                     textControllerEmail.text,
                                     textControllerPassword.text)
                                     .then((result) {
-                                  if (result != null) {
+                                  if (result != null && verified == true) {
                                     print(result);
                                     setState(() {
                                       loginStatus =
@@ -413,7 +568,12 @@ class _AuthDialogState extends State<RegisterDialog> {
                       Flexible(
                         flex: 1,
                         child: Container(
-                          width: double.maxFinite,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: Colors.blueGrey[800]!,
+                                width: 1,
+                              )),
                           child: TextButton(
                             style: TextButton.styleFrom(
                               primary: Colors.purple,
@@ -422,32 +582,58 @@ class _AuthDialogState extends State<RegisterDialog> {
                               ),
                             ),
                             onPressed: () async {
+
                               setState(() {
                                 _isRegistering = true;
                               });
+                            if (_validateEmail(textControllerEmail.text) ==
+                                null && _validatePassword(textControllerPassword.text) ==
+                                null && _validateBenutzername(textControllerBenutzername.text)==null &&
+                                _validateKlasse(textControllerKlasse.text)==null) {
                               await registerWithEmailPassword(
                                   textControllerEmail.text,
                                   textControllerPassword.text)
                                   .then((result) {
                                 if (result != null) {
+                                  print(result);
                                   setState(() {
                                     loginStatus =
-                                    'You have registered successfully';
+                                    'You have successfully logged in';
                                     loginStringColor = Colors.green;
+                                    store.collection("users").doc(uid).set(
+                                        {
+                                          'display_name' : textControllerBenutzername.text,
+                                          'email' : textControllerEmail.text,
+                                          'passwort' : textControllerPassword.text,
+                                          'abteilung' : abteilung,
+                                          'klasse' : textControllerKlasse.text,
+                                          'uid': uid.toString()
+                                        });
+                                    username = textControllerBenutzername.text;
                                   });
-                                  print(result);
                                 }
                               }).catchError((error) {
-                                print('Registration Error: $error');
+                                print('Login Error: $error');
                                 setState(() {
                                   loginStatus =
                                   'Error occured while registering';
                                   loginStringColor = Colors.red;
                                 });
                               });
-
+                            } else {
                               setState(() {
-                                _isRegistering = false;
+                                loginStatus = 'Please enter email & password';
+                                loginStringColor = Colors.red;
+                              });
+                            }
+                              setState(() {
+                                _isLoggingIn = false;
+                                textControllerEmail.text = '';
+                                textControllerPassword.text = '';
+                                _isEditingEmail = false;
+                                _isEditingPassword = false;
+                                textControllerKlasse.text ='';
+                                textControllerBenutzername.text='';
                               });
                             },
                             child: Padding(
