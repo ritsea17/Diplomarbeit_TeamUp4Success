@@ -1,40 +1,49 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/screens/home_page.dart';
 import 'package:explore/utils/authentication.dart';
+import 'package:explore/widgets/AdminEditUser.dart';
 import 'package:explore/widgets/Register.dart';
 import 'package:explore/widgets/profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 
-class ChangeClass extends StatefulWidget {
+class ChangeAbteilung extends StatefulWidget {
+  const ChangeAbteilung({Key? key, required this.Email}) : super(key: key);
+  final String Email;
   @override
-  _ChangeClassState createState() => _ChangeClassState();
+  _ChangeAbteilungState createState() => _ChangeAbteilungState();
 }
 
-class _ChangeClassState extends State<ChangeClass> {
+class _ChangeAbteilungState extends State<ChangeAbteilung> {
 
-  late TextEditingController textControllerOldClass;
-  late FocusNode textFocusNodeOldClass;
-  bool _isEditingOldClass = false;
+  late TextEditingController textControllerOldAbteilung;
+  late FocusNode textFocusNodeOldAbteilung;
+  bool _isEditingOldAbteilung = false;
 
-  late TextEditingController textControllerNewClass;
-  late FocusNode textFocusNodeNewClass;
-  bool _isEditingNewClass = false;
+  late TextEditingController textControllerNewAbteilung;
+  late FocusNode textFocusNodeNewAbteilung;
+  bool _isEditingNewAbteilung = false;
+
 
   @override
   void initState() {
-    textControllerOldClass = TextEditingController();
-    textControllerOldClass.text = '';
-    textFocusNodeOldClass = FocusNode();
-    textControllerNewClass = TextEditingController();
-    textControllerNewClass.text = '';
-    textFocusNodeNewClass = FocusNode();
+    textControllerOldAbteilung = TextEditingController();
+    textControllerOldAbteilung.text = '';
+    textFocusNodeOldAbteilung = FocusNode();
+    textControllerNewAbteilung = TextEditingController();
+    textControllerNewAbteilung.text = '';
+    textFocusNodeNewAbteilung = FocusNode();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
+
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    User? cuser= _auth.currentUser;
+    final store = FirebaseFirestore.instance;
 
     return Dialog(
       backgroundColor: Theme.of(context).backgroundColor,
@@ -65,7 +74,7 @@ class _ChangeClassState extends State<ChangeClass> {
                 Center(
 
                   child: Text(
-                    'Klasse ändern!!',
+                    'Abteilung ändern!!',
                     style: TextStyle(
                       color: Colors.purple,
                       fontSize: 30,
@@ -82,7 +91,7 @@ class _ChangeClassState extends State<ChangeClass> {
                     bottom: 8,
                   ),
                   child: Text(
-                    'Alte Klasse:',
+                    'Alte Abteilung:',
                     textAlign: TextAlign.left,
                     style: TextStyle(
                       color: Theme.of(context).textTheme.subtitle2!.color,
@@ -99,20 +108,21 @@ class _ChangeClassState extends State<ChangeClass> {
                     right: 20,
                   ),
                   child: TextField(
-                    focusNode: textFocusNodeOldClass,
+                    focusNode: textFocusNodeOldAbteilung,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    controller: textControllerOldClass,
+                    controller: textControllerOldAbteilung,
                     autofocus: false,
+                    obscureText: true,
                     onChanged: (value) {
                       setState(() {
-                        _isEditingOldClass = true;
+                        _isEditingOldAbteilung = true;
                       });
                     },
                     onSubmitted: (value) {
-                      textFocusNodeOldClass.unfocus();
+                      textFocusNodeOldAbteilung.unfocus();
                       FocusScope.of(context)
-                          .requestFocus(textFocusNodeNewClass);
+                          .requestFocus(textFocusNodeNewAbteilung);
                     },
                     style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
@@ -129,9 +139,9 @@ class _ChangeClassState extends State<ChangeClass> {
                       ),
                       hintText: "xyz",
                       fillColor: Colors.white,
-                      ),
                     ),
                   ),
+                ),
                 SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.only(
@@ -139,7 +149,7 @@ class _ChangeClassState extends State<ChangeClass> {
                     bottom: 8,
                   ),
                   child: Text(
-                    'Neue Klasse:',
+                    'Neue Abteilung:',
                     textAlign: TextAlign.left,
                     style: TextStyle(
                       color: Theme.of(context).textTheme.subtitle2!.color,
@@ -156,18 +166,21 @@ class _ChangeClassState extends State<ChangeClass> {
                     right: 20,
                   ),
                   child: TextField(
-                    focusNode: textFocusNodeNewClass,
+                    focusNode: textFocusNodeNewAbteilung,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    controller: textControllerNewClass,
+                    controller: textControllerNewAbteilung,
+                    obscureText: true,
                     autofocus: false,
                     onChanged: (value) {
                       setState(() {
-                        _isEditingNewClass = true;
+                        _isEditingNewAbteilung = true;
                       });
                     },
                     onSubmitted: (value) {
-                      textFocusNodeNewClass.unfocus();
+                      textFocusNodeNewAbteilung.unfocus();
+                      FocusScope.of(context)
+                          .requestFocus(textFocusNodeNewAbteilung);
                     },
                     style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
@@ -188,21 +201,20 @@ class _ChangeClassState extends State<ChangeClass> {
                   ),
                 ),
                 Center(
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_forward),
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    iconSize: 40,
+                    color: Colors.green,
+                    onPressed: () {
 
-
-                child: IconButton(
-                  icon: Icon(Icons.arrow_forward),
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  iconSize: 40,
-                  color: Colors.green,
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => ProfilPage(),
-                    );
-                  },
-                ),
+                      showDialog(
+                        context: context,
+                        builder: (context) => AdminEditUser(email: widget.Email),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),

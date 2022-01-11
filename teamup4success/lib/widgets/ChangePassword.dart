@@ -7,29 +7,30 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 
-class ChangeUsername extends StatefulWidget {
+class ChangePassword extends StatefulWidget {
   @override
-  _ChangeUsernameState createState() => _ChangeUsernameState();
+  _ChangePasswordState createState() => _ChangePasswordState();
 }
 
-class _ChangeUsernameState extends State<ChangeUsername> {
+class _ChangePasswordState extends State<ChangePassword> {
 
-  late TextEditingController textControllerOldUsername;
-  late FocusNode textFocusNodeOldUsername;
-  bool _isEditingOldUsername = false;
+  late TextEditingController textControllerOldPassword;
+  late FocusNode textFocusNodeOldPassword;
+  bool _isEditingOldPassword = false;
 
-  late TextEditingController textControllerNewUsername;
-  late FocusNode textFocusNodeNewUsername;
-  bool _isEditingNewUsername = false;
+  late TextEditingController textControllerNewPassword;
+  late FocusNode textFocusNodeNewPassword;
+  bool _isEditingNewPassword = false;
+
 
   @override
   void initState() {
-    textControllerOldUsername = TextEditingController();
-    textControllerOldUsername.text = '';
-    textFocusNodeOldUsername = FocusNode();
-    textControllerNewUsername = TextEditingController();
-    textControllerNewUsername.text = '';
-    textFocusNodeNewUsername = FocusNode();
+    textControllerOldPassword = TextEditingController();
+    textControllerOldPassword.text = '';
+    textFocusNodeOldPassword = FocusNode();
+    textControllerNewPassword = TextEditingController();
+    textControllerNewPassword.text = '';
+    textFocusNodeNewPassword = FocusNode();
     super.initState();
   }
 
@@ -40,7 +41,7 @@ class _ChangeUsernameState extends State<ChangeUsername> {
     final FirebaseAuth _auth = FirebaseAuth.instance;
     User? cuser= _auth.currentUser;
     final store = FirebaseFirestore.instance;
-
+    
     return Dialog(
       backgroundColor: Theme.of(context).backgroundColor,
       shape: RoundedRectangleBorder(
@@ -70,7 +71,7 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                 Center(
 
                   child: Text(
-                    'Benutzername ändern!!',
+                    'Passwort ändern!!',
                     style: TextStyle(
                       color: Colors.purple,
                       fontSize: 30,
@@ -87,7 +88,7 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                     bottom: 8,
                   ),
                   child: Text(
-                    'Alter Benutzername:',
+                    'Altes Passwort:',
                     textAlign: TextAlign.left,
                     style: TextStyle(
                       color: Theme.of(context).textTheme.subtitle2!.color,
@@ -104,20 +105,21 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                     right: 20,
                   ),
                   child: TextField(
-                    focusNode: textFocusNodeOldUsername,
+                    focusNode: textFocusNodeOldPassword,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    controller: textControllerOldUsername,
+                    controller: textControllerOldPassword,
                     autofocus: false,
+                    obscureText: true,
                     onChanged: (value) {
                       setState(() {
-                        _isEditingOldUsername = true;
+                        _isEditingOldPassword = true;
                       });
                     },
                     onSubmitted: (value) {
-                      textFocusNodeOldUsername.unfocus();
+                      textFocusNodeOldPassword.unfocus();
                       FocusScope.of(context)
-                          .requestFocus(textFocusNodeNewUsername);
+                          .requestFocus(textFocusNodeNewPassword);
                     },
                     style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
@@ -134,9 +136,9 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                       ),
                       hintText: "xyz",
                       fillColor: Colors.white,
+                      ),
                     ),
                   ),
-                ),
                 SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.only(
@@ -144,7 +146,7 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                     bottom: 8,
                   ),
                   child: Text(
-                    'Neuer Benutzername:',
+                    'Neues Passwort:',
                     textAlign: TextAlign.left,
                     style: TextStyle(
                       color: Theme.of(context).textTheme.subtitle2!.color,
@@ -161,18 +163,21 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                     right: 20,
                   ),
                   child: TextField(
-                    focusNode: textFocusNodeNewUsername,
+                    focusNode: textFocusNodeNewPassword,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    controller: textControllerNewUsername,
+                    controller: textControllerNewPassword,
+                    obscureText: true,
                     autofocus: false,
                     onChanged: (value) {
                       setState(() {
-                        _isEditingNewUsername = true;
+                        _isEditingNewPassword = true;
                       });
                     },
                     onSubmitted: (value) {
-                      textFocusNodeNewUsername.unfocus();
+                      textFocusNodeNewPassword.unfocus();
+                      FocusScope.of(context)
+                          .requestFocus(textFocusNodeNewPassword);
                     },
                     style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
@@ -193,8 +198,6 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                   ),
                 ),
                 Center(
-
-
                   child: IconButton(
                     icon: Icon(Icons.arrow_forward),
                     splashColor: Colors.transparent,
@@ -202,7 +205,7 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                     iconSize: 40,
                     color: Colors.green,
                     onPressed: () {
-                      store.collection("users").doc(cuser!.uid.toString()).update({'display_name': textControllerNewUsername.text.toString()});
+                      cuser!.updatePassword(textControllerNewPassword.text.toString());
                       showDialog(
                         context: context,
                         builder: (context) => ProfilPage(),

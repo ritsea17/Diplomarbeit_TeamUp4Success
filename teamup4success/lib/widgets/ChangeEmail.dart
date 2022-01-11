@@ -1,35 +1,39 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/screens/home_page.dart';
 import 'package:explore/utils/authentication.dart';
+import 'package:explore/widgets/AdminEditUser.dart';
 import 'package:explore/widgets/Register.dart';
 import 'package:explore/widgets/profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 
-class ChangeUsername extends StatefulWidget {
+class ChangeEmail extends StatefulWidget {
+  const ChangeEmail({Key? key, required this.Email}) : super(key: key);
+  final String Email;
   @override
-  _ChangeUsernameState createState() => _ChangeUsernameState();
+  _ChangeEmailState createState() => _ChangeEmailState();
 }
 
-class _ChangeUsernameState extends State<ChangeUsername> {
+class _ChangeEmailState extends State<ChangeEmail> {
 
-  late TextEditingController textControllerOldUsername;
-  late FocusNode textFocusNodeOldUsername;
-  bool _isEditingOldUsername = false;
+  late TextEditingController textControllerOldEmail;
+  late FocusNode textFocusNodeOldEmail;
+  bool _isEditingOldEmail = false;
 
-  late TextEditingController textControllerNewUsername;
-  late FocusNode textFocusNodeNewUsername;
-  bool _isEditingNewUsername = false;
+  late TextEditingController textControllerNewEmail;
+  late FocusNode textFocusNodeNewEmail;
+  bool _isEditingNewEmail = false;
+
 
   @override
   void initState() {
-    textControllerOldUsername = TextEditingController();
-    textControllerOldUsername.text = '';
-    textFocusNodeOldUsername = FocusNode();
-    textControllerNewUsername = TextEditingController();
-    textControllerNewUsername.text = '';
-    textFocusNodeNewUsername = FocusNode();
+    textControllerOldEmail = TextEditingController();
+    textControllerOldEmail.text = '';
+    textFocusNodeOldEmail = FocusNode();
+    textControllerNewEmail = TextEditingController();
+    textControllerNewEmail.text = '';
+    textFocusNodeNewEmail = FocusNode();
     super.initState();
   }
 
@@ -70,7 +74,7 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                 Center(
 
                   child: Text(
-                    'Benutzername ändern!!',
+                    'Email ändern!!',
                     style: TextStyle(
                       color: Colors.purple,
                       fontSize: 30,
@@ -87,7 +91,7 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                     bottom: 8,
                   ),
                   child: Text(
-                    'Alter Benutzername:',
+                    'Altes Email:',
                     textAlign: TextAlign.left,
                     style: TextStyle(
                       color: Theme.of(context).textTheme.subtitle2!.color,
@@ -104,20 +108,21 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                     right: 20,
                   ),
                   child: TextField(
-                    focusNode: textFocusNodeOldUsername,
+                    focusNode: textFocusNodeOldEmail,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    controller: textControllerOldUsername,
+                    controller: textControllerOldEmail,
                     autofocus: false,
+                    obscureText: true,
                     onChanged: (value) {
                       setState(() {
-                        _isEditingOldUsername = true;
+                        _isEditingOldEmail = true;
                       });
                     },
                     onSubmitted: (value) {
-                      textFocusNodeOldUsername.unfocus();
+                      textFocusNodeOldEmail.unfocus();
                       FocusScope.of(context)
-                          .requestFocus(textFocusNodeNewUsername);
+                          .requestFocus(textFocusNodeNewEmail);
                     },
                     style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
@@ -144,7 +149,7 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                     bottom: 8,
                   ),
                   child: Text(
-                    'Neuer Benutzername:',
+                    'Neue Email:',
                     textAlign: TextAlign.left,
                     style: TextStyle(
                       color: Theme.of(context).textTheme.subtitle2!.color,
@@ -161,18 +166,21 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                     right: 20,
                   ),
                   child: TextField(
-                    focusNode: textFocusNodeNewUsername,
+                    focusNode: textFocusNodeNewEmail,
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next,
-                    controller: textControllerNewUsername,
+                    controller: textControllerNewEmail,
+                    obscureText: true,
                     autofocus: false,
                     onChanged: (value) {
                       setState(() {
-                        _isEditingNewUsername = true;
+                        _isEditingNewEmail = true;
                       });
                     },
                     onSubmitted: (value) {
-                      textFocusNodeNewUsername.unfocus();
+                      textFocusNodeNewEmail.unfocus();
+                      FocusScope.of(context)
+                          .requestFocus(textFocusNodeNewEmail);
                     },
                     style: TextStyle(color: Colors.black),
                     decoration: InputDecoration(
@@ -193,8 +201,6 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                   ),
                 ),
                 Center(
-
-
                   child: IconButton(
                     icon: Icon(Icons.arrow_forward),
                     splashColor: Colors.transparent,
@@ -202,10 +208,9 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                     iconSize: 40,
                     color: Colors.green,
                     onPressed: () {
-                      store.collection("users").doc(cuser!.uid.toString()).update({'display_name': textControllerNewUsername.text.toString()});
                       showDialog(
                         context: context,
-                        builder: (context) => ProfilPage(),
+                        builder: (context) => AdminEditUser(email: widget.Email),
                       );
                     },
                   ),

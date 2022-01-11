@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:explore/screens/home_page.dart';
 import 'package:explore/utils/authentication.dart';
 import 'package:explore/widgets/Fachauswahl.dart';
+import 'package:explore/widgets/MeineFaecher.dart';
+import 'package:explore/widgets/SchuelerverwaltungAdmin.dart';
 import 'package:explore/widgets/profil.dart';
 import 'package:explore/widgets/Register.dart';
 import 'package:explore/widgets/auth_dialog.dart';
@@ -22,6 +25,7 @@ class TopBarContents extends StatefulWidget {
   _TopBarContentsState createState() => _TopBarContentsState();
 }
 
+
 class _TopBarContentsState extends State<TopBarContents> {
   final List _isHovering = [
     false,
@@ -33,16 +37,45 @@ class _TopBarContentsState extends State<TopBarContents> {
     false,
     false
   ];
-
+  Future<void> _KeinUserAngemeldet() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Kein User Angemeldet'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Um TeamUp4Success zu nutzen müssen Sie sich bitte Anmelden oder Registrieren'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Verstanden'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   bool _isProcessing = false;
 
   @override
   Widget build(BuildContext context) {
 
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    User? cuser= _auth.currentUser;
+
     var screenSize = MediaQuery
         .of(context)
         .size;
+
       return PreferredSize(
           preferredSize: Size(screenSize.width, 1000),
           child: Container(
@@ -88,7 +121,41 @@ class _TopBarContentsState extends State<TopBarContents> {
                                   : _isHovering[0] = false;
                             });
                           },
-                          onTap: () {},
+                          onTap: () {
+                            if(cuser!.uid.isNotEmpty) {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => MeineFaecherPage()
+                              );
+                            }else{
+                              AlertDialog(
+                                    title: Text('Kein User Angemeldet'),
+                                    content: SingleChildScrollView(
+                                      child: ListBody(
+                                        children: <Widget>[
+                                          Text('Um TeamUp4Success zu nutzen müssen Sie sich bitte Anmelden oder Registrieren'),
+                                        ],
+                                      ),
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: Text('Verstanden'),
+                                        onPressed: () {
+                                          Future.delayed(Duration(milliseconds: 500),
+                                                  () {
+                                                Navigator.of(context).pop();
+                                                Navigator.of(context)
+                                                    .pushReplacement(MaterialPageRoute(
+                                                  fullscreenDialog: true,
+                                                  builder: (context) => HomePage(),
+                                                ));
+                                              });
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                }
+                          },
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -124,10 +191,17 @@ class _TopBarContentsState extends State<TopBarContents> {
                                   : _isHovering[1] = false;
                             });
                           },
-                          onTap: () {showDialog(
-                              context: context,
-                              builder: (context) => FachauswahlPage()
-                          );
+                          onTap: () {
+
+                            if(cuser!.uid.isNotEmpty) {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => FachauswahlPage()
+                              );
+                            }else{
+                              _KeinUserAngemeldet();
+                            }
+
                           },
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -165,7 +239,14 @@ class _TopBarContentsState extends State<TopBarContents> {
                             });
                           },
                           onTap: () {
-
+                            if(cuser!.uid.isNotEmpty) {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => SchuelerverwaltungPage()
+                              );
+                            }else{
+                              _KeinUserAngemeldet();
+                            }
                           },
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -204,10 +285,14 @@ class _TopBarContentsState extends State<TopBarContents> {
                             });
                           },
                           onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => ProfilPage(),
-                            );
+                            if(cuser!.uid.isNotEmpty) {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => ProfilPage()
+                              );
+                            }else{
+                              _KeinUserAngemeldet();
+                            }
                           },
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -237,15 +322,6 @@ class _TopBarContentsState extends State<TopBarContents> {
                         ),
                       ],
                     ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.brightness_6),
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    color: Colors.purple,
-                    onPressed: () {
-                      EasyDynamicTheme.of(context).changeTheme();
-                    },
                   ),
                   SizedBox(
                     width: screenSize.width / 50,

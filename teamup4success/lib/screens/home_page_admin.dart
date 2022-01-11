@@ -1,5 +1,6 @@
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:explore/utils/authentication.dart';
+import 'package:explore/widgets/top_bar_contents_admin.dart';
 import 'package:explore/widgets/web_scrollbar.dart';
 import 'package:explore/widgets/explore_drawer.dart';
 import 'package:explore/widgets/responsive.dart';
@@ -7,14 +8,14 @@ import 'package:explore/widgets/top_bar_contents.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatefulWidget {
+class HomePageAdmin extends StatefulWidget {
   static const String route = '/';
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePageAdminState createState() => _HomePageAdminState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageAdminState extends State<HomePageAdmin> {
   late ScrollController _scrollController;
   double _scrollPosition = 0;
   double _opacity = 0;
@@ -45,27 +46,27 @@ class _HomePageState extends State<HomePage> {
       extendBodyBehindAppBar: true,
       appBar: ResponsiveWidget.isSmallScreen(context)
           ? AppBar(
-              backgroundColor:
-                  Theme.of(context).bottomAppBarColor.withOpacity(_opacity)
+        backgroundColor:
+        Theme.of(context).bottomAppBarColor.withOpacity(_opacity)
         ,
-              elevation: 0,
-              centerTitle: true,
-              title: Text(
-                'TeamUp4Success',
-                style: TextStyle(
-                  color: Colors.blueGrey[100],
-                  fontSize: 20,
-                  fontFamily: 'Montserrat',
-                  fontWeight: FontWeight.w400,
-                  letterSpacing: 3,
-                ),
-              ),
-            )
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          'TeamUp4Success',
+          style: TextStyle(
+            color: Colors.blueGrey[100],
+            fontSize: 20,
+            fontFamily: 'Montserrat',
+            fontWeight: FontWeight.w400,
+            letterSpacing: 3,
+          ),
+        ),
+      )
           : PreferredSize(
-              preferredSize: Size(screenSize.width, 1000),
-              child: TopBarContents(_opacity),
+        preferredSize: Size(screenSize.width, 1000),
+        child: TopBarContentsAdmin(_opacity),
 
-            ),
+      ),
       drawer: ExploreDrawer(),
       body: WebScrollbar(
         color: Colors.blueGrey,
@@ -90,23 +91,23 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                 ],
-                    ),
-              Text(
-                "Willkommen bei TeamUp4Success",
-                style: TextStyle(
-                color: Colors.black,
-                fontSize: 60,
-                fontFamily: 'Montserrat',
-                fontWeight: FontWeight.w400,
-                letterSpacing: 3,
+                ],
               ),
+              Text(
+                "Willkommen auf der Admin-Seite",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 60,
+                  fontFamily: 'Montserrat',
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 3,
+                ),
               ),
 
-     ],
-    ),
-    ),
-    ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

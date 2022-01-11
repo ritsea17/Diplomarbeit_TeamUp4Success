@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/screens/home_page.dart';
+import 'package:explore/screens/home_page_admin.dart';
 import 'package:explore/utils/authentication.dart';
 import 'package:explore/widgets/Register.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -29,6 +31,8 @@ class _AuthDialogState extends State<AuthDialog> {
   Color loginStringColor = Colors.green;
 
   User? user;
+
+  late List Admins;
 
   String? _validateEmail(String value) {
     value = value.trim();
@@ -84,6 +88,8 @@ class _AuthDialogState extends State<AuthDialog> {
   @override
   Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
+
+    final store = FirebaseFirestore.instance;
 
     return Dialog(
       backgroundColor: Theme.of(context).backgroundColor,
@@ -302,16 +308,20 @@ class _AuthDialogState extends State<AuthDialog> {
                                       loginStatus =
                                           'Du hast dich erfolgreich angemeldet!';
                                       loginStringColor = Colors.green;
+
                                     });
-                                    Future.delayed(Duration(milliseconds: 500),
-                                        () {
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context)
-                                          .pushReplacement(MaterialPageRoute(
-                                        fullscreenDialog: true,
-                                        builder: (context) => HomePage(),
-                                      ));
-                                    });
+                                    Future.delayed(
+                                        Duration(milliseconds: 500),
+                                            () {
+                                          Navigator.of(context).pop();
+                                          Navigator.of(context)
+                                              .pushReplacement(
+                                              MaterialPageRoute(
+                                                fullscreenDialog: true,
+                                                builder: (context) =>
+                                                    HomePage(),
+                                              ));
+                                        });
                                   }
                                 }).catchError((error) {
                                   print('Login Error: $error');

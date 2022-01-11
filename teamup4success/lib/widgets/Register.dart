@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/screens/home_page.dart';
+import 'package:explore/screens/home_page_admin.dart';
 import 'package:explore/utils/authentication.dart';
 import 'package:explore/widgets/auth_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -43,6 +44,10 @@ class _AuthDialogState extends State<RegisterDialog> {
 
   String? loginStatus;
   Color loginStringColor = Colors.green;
+
+
+  late List Admins;
+
 
   String? _validateEmail(String value) {
     value = value.trim();
@@ -120,7 +125,13 @@ class _AuthDialogState extends State<RegisterDialog> {
 
   @override
   Widget build(BuildContext context) {
+
+
+
     var screenSize = MediaQuery.of(context).size;
+
+    final FirebaseAuth _auth1 = FirebaseAuth.instance;
+    final User? cuser = _auth1.currentUser;
 
     return Dialog(
       backgroundColor: Theme.of(context).backgroundColor,
@@ -504,14 +515,17 @@ class _AuthDialogState extends State<RegisterDialog> {
                                       'You have successfully logged in';
                                       loginStringColor = Colors.green;
                                     });
-                                    Future.delayed(Duration(milliseconds: 500),
+                                    Future.delayed(
+                                        Duration(milliseconds: 500),
                                             () {
                                           Navigator.of(context).pop();
                                           Navigator.of(context)
-                                              .pushReplacement(MaterialPageRoute(
-                                            fullscreenDialog: true,
-                                            builder: (context) => HomePage(),
-                                          ));
+                                              .pushReplacement(
+                                              MaterialPageRoute(
+                                                fullscreenDialog: true,
+                                                builder: (context) =>
+                                                    HomePage(),
+                                              ));
                                         });
                                   }
                                 }).catchError((error) {
@@ -600,16 +614,18 @@ class _AuthDialogState extends State<RegisterDialog> {
                                     loginStatus =
                                     'You have successfully logged in';
                                     loginStringColor = Colors.green;
+
                                     store.collection("users").doc(uid).set(
                                         {
                                           'display_name' : textControllerBenutzername.text,
                                           'email' : textControllerEmail.text,
-                                          'passwort' : textControllerPassword.text,
                                           'abteilung' : abteilung,
                                           'klasse' : textControllerKlasse.text,
                                           'uid': uid.toString()
                                         });
+
                                     username = textControllerBenutzername.text;
+                                    //cuser!.displayName=textControllerBenutzername.toString();
                                   });
                                 }
                               }).catchError((error) {

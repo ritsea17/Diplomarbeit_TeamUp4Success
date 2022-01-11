@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:explore/utils/authentication.dart';
+import 'package:explore/widgets/ChangePassword.dart';
+import 'package:explore/widgets/ChangeUserName.dart';
 import 'package:explore/widgets/web_scrollbar.dart';
 import 'package:explore/widgets/explore_drawer.dart';
 import 'package:explore/widgets/responsive.dart';
@@ -9,16 +11,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:explore/widgets/Register.dart';
 
-import 'ChangeClass.dart';
-import 'ChangeUserName.dart';
+
+
 
 class ProfilPage extends StatefulWidget {
   static const String route = 'Profil';
+
   @override
   _ProfilPageState createState() => _ProfilPageState();
 
-
 }
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
+User? cuser= _auth.currentUser;
+final store = FirebaseFirestore.instance;
 
 
 class _ProfilPageState extends State<ProfilPage> {
@@ -26,11 +32,11 @@ class _ProfilPageState extends State<ProfilPage> {
   late ScrollController _scrollController;
   double _scrollPosition = 0;
   double _opacity = 0;
-
   _scrollListener() {
     setState(() {
       _scrollPosition = _scrollController.position.pixels;
     });
+
   }
 
   @override
@@ -38,24 +44,27 @@ class _ProfilPageState extends State<ProfilPage> {
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     super.initState();
+
   }
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  @override
-  Widget build(BuildContext context) {
-    User? cuser= _auth.currentUser;
-
-    final store = FirebaseFirestore.instance;
-
-    store.collection("users").doc(uid).get().then((data)
-    {
-
+  String? getUsername(){
+    String? username;
+    store.collection("users").doc(cuser!.uid.toString()).get().then((value){
+       username = value.data()!["display_name"];
     });
 
+    return username;
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
     var screenSize = MediaQuery.of(context).size;
     _opacity = _scrollPosition < screenSize.height * 0.40
         ? _scrollPosition / (screenSize.height * 0.40)
         : 1;
+
+
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -112,14 +121,46 @@ class _ProfilPageState extends State<ProfilPage> {
               Center(
               child: Row(
                   children: [
+
                     Text(
                       'Benutzername: ',
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: 20,
+                        fontSize: 30,
                         fontFamily: 'Montserrat',
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.bold,
                         letterSpacing: 3,
+                      ),
+                    ),
+                    RichText(
+
+                      text: TextSpan(
+                        children: [
+                          // Use WidgetSpan instead of TextSpan, which allows you to have a child widget
+                          WidgetSpan(
+
+                            // Use StreamBuilder to listen on the changes of your Firestore document.
+                            child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                              stream: FirebaseFirestore.instance
+                                  .collection("users")
+                                  .doc(cuser!.uid.toString())
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                final document = snapshot.data; // Get the document snapshot
+                                final text = document?.data()?['display_name']; // Get the data in the text field
+
+                                return Text(text ?? 'Kein Name',style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 30,
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.w400,
+                                  letterSpacing: 3,
+
+                                ),); // Show loading if text is null
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     IconButton(
@@ -127,11 +168,13 @@ class _ProfilPageState extends State<ProfilPage> {
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
                       color: Colors.purple,
+                      iconSize: 30,
                       onPressed: () {
                         showDialog(
                           context: context,
                           builder: (context) => ChangeUsername(),
                         );
+
                       },
                     ),
                   ],
@@ -144,23 +187,42 @@ class _ProfilPageState extends State<ProfilPage> {
                       "Klasse: ",
               style: TextStyle(
                 color: Colors.black,
-                fontSize: 20,
+                fontSize: 30,
                 fontFamily: 'Montserrat',
-                fontWeight: FontWeight.w400,
+                fontWeight: FontWeight.bold,
                 letterSpacing: 3,
               ),
                   ),
-                  IconButton(
-                    icon: Icon(Icons.create),
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    color: Colors.purple,
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => ChangeClass(),
-                      );
-                    },
+                  RichText(
+
+                    text: TextSpan(
+
+                      children: [
+                        // Use WidgetSpan instead of TextSpan, which allows you to have a child widget
+                        WidgetSpan(
+
+                          // Use StreamBuilder to listen on the changes of your Firestore document.
+                          child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                            stream: FirebaseFirestore.instance
+                                .collection("users")
+                                .doc(cuser!.uid.toString())
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              final document = snapshot.data; // Get the document snapshot
+                              final text = document?.data()?['klasse']; // Get the data in the text field
+
+                              return Text(text ?? 'Keine Klasse', style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 30,
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w400,
+                                letterSpacing: 3,
+                              ),); // Show loading if text is null
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -174,22 +236,43 @@ class _ProfilPageState extends State<ProfilPage> {
                       "Abteilung: ",
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 20,
+                      fontSize: 30,
                       fontFamily: 'Montserrat',
-                      fontWeight: FontWeight.w400,
+                      fontWeight: FontWeight.bold,
                       letterSpacing: 3,
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(Icons.create),
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    color: Colors.purple,
-                    onPressed: () {
+                  RichText(
 
-                    },
+                    text: TextSpan(
+
+                      children: [
+                        // Use WidgetSpan instead of TextSpan, which allows you to have a child widget
+                        WidgetSpan(
+
+                          // Use StreamBuilder to listen on the changes of your Firestore document.
+                          child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                            stream: FirebaseFirestore.instance
+                                .collection("users")
+                                .doc(cuser!.uid.toString())
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              final document = snapshot.data; // Get the document snapshot
+                              final text = document?.data()?['abteilung']; // Get the data in the text field
+
+                              return Text(text ?? 'Keine Abteilung', style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 30,
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w400,
+                                letterSpacing: 3,
+                              ),); // Show loading if text is null
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-
                 ],
               ),
               ),
@@ -201,9 +284,9 @@ class _ProfilPageState extends State<ProfilPage> {
                     "Email: ",
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: 20,
+                    fontSize: 30,
                     fontFamily: 'Montserrat',
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.bold,
                     letterSpacing: 3,
                   ),
                 ),
@@ -211,7 +294,7 @@ class _ProfilPageState extends State<ProfilPage> {
                     ""+cuser!.email.toString(),
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 20,
+                      fontSize: 30,
                       fontFamily: 'Montserrat',
                       fontWeight: FontWeight.w400,
                       letterSpacing: 3,
@@ -220,7 +303,35 @@ class _ProfilPageState extends State<ProfilPage> {
                 ],
               )
               ),
-
+              Center(
+                  child: Row(
+                    children: [
+                      Text(
+                        "Passwort ändern ",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 30,
+                          fontFamily: 'Montserrat',
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 3,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.create),
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        color: Colors.purple,
+                        iconSize: 30,
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => ChangePassword(),
+                          );
+                        },
+                      ),
+                    ],
+                  )
+              ),
             ],
           ),
         ),
