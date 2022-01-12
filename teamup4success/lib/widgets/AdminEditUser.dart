@@ -264,7 +264,7 @@ class _AdminEditUserState extends State<AdminEditUser> {
                               builder: (context, snapshot) {// Get the data in the text field
 
 
-                                return Text(snapshot.data!.docs.single['abteilung'] ?? 'Keine Abteilung',style: TextStyle(
+                                return Text(snapshot.data!.docs.single['department'] ?? 'Keine Abteilung',style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 30,
                                   fontFamily: 'Montserrat',

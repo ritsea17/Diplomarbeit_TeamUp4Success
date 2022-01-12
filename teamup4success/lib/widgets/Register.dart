@@ -46,7 +46,7 @@ class _AuthDialogState extends State<RegisterDialog> {
   Color loginStringColor = Colors.green;
 
 
-  late List Admins;
+  List admins=[];
 
 
   String? _validateEmail(String value) {
@@ -515,18 +515,41 @@ class _AuthDialogState extends State<RegisterDialog> {
                                       'You have successfully logged in';
                                       loginStringColor = Colors.green;
                                     });
-                                    Future.delayed(
-                                        Duration(milliseconds: 500),
-                                            () {
-                                          Navigator.of(context).pop();
-                                          Navigator.of(context)
-                                              .pushReplacement(
-                                              MaterialPageRoute(
-                                                fullscreenDialog: true,
-                                                builder: (context) =>
-                                                    HomePage(),
-                                              ));
-                                        });
+
+                                    store.collection('admins').doc('2ateEChEcqnI1gIFw7Hh').get().then((value) =>{
+                                      value.data()!.forEach((key, value) {
+                                        admins=value;
+                                      })
+                                    });
+
+                                    if(admins.contains(cuser!.email)) {
+                                      Future.delayed(
+                                          Duration(milliseconds: 500),
+                                              () {
+                                            Navigator.of(context).pop();
+                                            Navigator.of(context)
+                                                .pushReplacement(
+                                                MaterialPageRoute(
+                                                  fullscreenDialog: true,
+                                                  builder: (context) =>
+                                                      HomePageAdmin(),
+                                                ));
+                                          });
+
+                                    }else{
+                                      Future.delayed(
+                                          Duration(milliseconds: 500),
+                                              () {
+                                            Navigator.of(context).pop();
+                                            Navigator.of(context)
+                                                .pushReplacement(
+                                                MaterialPageRoute(
+                                                  fullscreenDialog: true,
+                                                  builder: (context) =>
+                                                      HomePage(),
+                                                ));
+                                          });
+                                    }
                                   }
                                 }).catchError((error) {
                                   print('Login Error: $error');
@@ -619,7 +642,7 @@ class _AuthDialogState extends State<RegisterDialog> {
                                         {
                                           'display_name' : textControllerBenutzername.text,
                                           'email' : textControllerEmail.text,
-                                          'abteilung' : abteilung,
+                                          'department' : abteilung,
                                           'klasse' : textControllerKlasse.text,
                                           'uid': uid.toString()
                                         });

@@ -94,7 +94,7 @@ class _HomePageAdminState extends State<HomePageAdmin> {
                 ],
               ),
               Text(
-                "Willkommen auf der Admin-Seite",
+                "Willkommen bei TeamUp4Success",
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 60,

@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:explore/screens/home_page.dart';
+import 'package:explore/screens/home_page_admin.dart';
 import 'package:explore/utils/authentication.dart';
+import 'package:explore/widgets/AdminBereich.dart';
 import 'package:explore/widgets/Fachauswahl.dart';
 import 'package:explore/widgets/MeineFaecher.dart';
-import 'package:explore/widgets/SchuelerverwaltungAdmin.dart';
 import 'package:explore/widgets/profil.dart';
 import 'package:explore/widgets/Register.dart';
 import 'package:explore/widgets/auth_dialog.dart';
@@ -14,16 +15,14 @@ import 'package:flutter/material.dart';
 
 class TopBarContentsAdmin extends StatefulWidget {
   final double opacity;
-  String? name;
-  String? email;
-  String? passwort;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+
 
   TopBarContentsAdmin(this.opacity);
 
   @override
   _TopBarContentsAdminState createState() => _TopBarContentsAdminState();
 }
+
 
 
 class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
@@ -63,13 +62,42 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
       },
     );
   }
+  Future<void> _NichtAlsAdminAngemeldet() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Kein Admin'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Um diese Funktion nutzen zu können müssen sie Admin-Rechte besitzen'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Verstanden'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  final store = FirebaseFirestore.instance;
+  List admins = [];
   bool _isProcessing = false;
 
   @override
   Widget build(BuildContext context) {
 
-    final FirebaseAuth _auth = FirebaseAuth.instance;
     User? cuser= _auth.currentUser;
 
     var screenSize = MediaQuery
@@ -103,7 +131,7 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
                                   Navigator.of(context)
                                       .pushReplacement(MaterialPageRoute(
                                     fullscreenDialog: true,
-                                    builder: (context) => HomePage(),
+                                    builder: (context) => HomePageAdmin(),
                                   ));
                                 })
                   ),
@@ -112,7 +140,7 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      SizedBox(width: screenSize.width / 8),
+                      SizedBox(width: screenSize.width / 12),
                       InkWell(
                         onHover: (value) {
                           setState(() {
@@ -122,6 +150,7 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
                           });
                         },
                         onTap: () {
+
                           if(cuser!.uid.isNotEmpty) {
                             showDialog(
                                 context: context,
@@ -147,7 +176,7 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
                                           Navigator.of(context)
                                               .pushReplacement(MaterialPageRoute(
                                             fullscreenDialog: true,
-                                            builder: (context) => HomePage(),
+                                            builder: (context) => HomePageAdmin(),
                                           ));
                                         });
                                   },
@@ -175,7 +204,7 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
                               visible: _isHovering[0],
                               child: Container(
                                 height: 2,
-                                width: 20,
+                                width: 15,
                                 color: Colors.white,
                               ),
                             )
@@ -222,7 +251,7 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
                               visible: _isHovering[1],
                               child: Container(
                                 height: 2,
-                                width: 20,
+                                width: 15,
                                 color: Colors.white,
                               ),
                             )
@@ -260,7 +289,7 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
                               visible: _isHovering[2],
                               child: Container(
                                 height: 2,
-                                width: 20,
+                                width: 15,
                                 color: Colors.white,
                               ),
                             )
@@ -278,7 +307,7 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
                           });
                         },
                         onTap: () {
-                          if(cuser!.uid.isNotEmpty) {
+                          if(cuser!.uid.isNotEmpty&& cuser.email!=null) {
                             showDialog(
                                 context: context,
                                 builder: (context) => ProfilPage()
@@ -306,7 +335,7 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
                               visible: _isHovering[3],
                               child: Container(
                                 height: 2,
-                                width: 20,
+                                width: 15,
                                 color: Colors.white,
                               ),
                             )
@@ -317,6 +346,12 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
                       InkWell(
                         onHover: (value) {
                           setState(() {
+                            store.collection('admins').doc('2ateEChEcqnI1gIFw7Hh').get().then((value) =>{
+                              value.data()!.forEach((key, value) {
+
+                                admins=value;
+                              })
+                            });
                             value
                                 ? _isHovering[4] = true
                                 : _isHovering[4] = false;
@@ -324,11 +359,22 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
                           });
                         },
                         onTap: () {
-                          if(cuser!.uid.isNotEmpty) {
-                            showDialog(
-                                context: context,
-                                builder: (context) => SchuelerverwaltungPage()
-                            );
+                          store.collection('admins').doc('2ateEChEcqnI1gIFw7Hh').get().then((value) =>{
+                            value.data()!.forEach((key, value) {
+
+                              admins=value;
+                            })
+                          });
+                          if(cuser!.uid!=null) {
+                            if(admins.contains(cuser.email)) {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => Adminbereich()
+
+                              );
+                            }else{
+                              _NichtAlsAdminAngemeldet();
+                            }
                           }else{
                             _KeinUserAngemeldet();
                           }
@@ -337,7 +383,7 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Schülerverwaltung',
+                              'Administratorbereich',
                               style: TextStyle(
                                 color: _isHovering[4]
                                     ? Colors.blue[200]
@@ -352,7 +398,7 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
                               visible: _isHovering[4],
                               child: Container(
                                 height: 2,
-                                width: 20,
+                                width: 15,
                                 color: Colors.white,
                               ),
                             )
@@ -373,6 +419,8 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
                   },
                   onTap: userEmail == null
                       ? () {
+
+                    print(admins);
                     showDialog(
                       context: context,
                       builder: (context) => AuthDialog(),
@@ -428,7 +476,7 @@ class _TopBarContentsAdminState extends State<TopBarContentsAdmin> {
                             Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                 fullscreenDialog: true,
-                                builder: (context) => HomePage(),
+                                builder: (context) => HomePageAdmin(),
                               ),
                             );
                           }).catchError((error) {

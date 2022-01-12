@@ -129,7 +129,7 @@ class _MeineFaecherState extends State<MeineFaecherPage>
                                             contentPadding: EdgeInsets.only(
                                                 top: 5.0),
                                             leading: SizedBox(
-                                              width: 500.0,
+                                              width: 800.0,
                                               child: RichText(
                                               text: TextSpan(
                                                   text: document[i],
@@ -200,7 +200,7 @@ class _MeineFaecherState extends State<MeineFaecherPage>
                       child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                         stream: FirebaseFirestore.instance
                             .collection("users")
-                            .where('uid', isEqualTo: cuser!.uid.toString() )
+                            .where('uid', isEqualTo: cuser.uid.toString() )
                             .snapshots(),
                         builder: (context, snapshot) {
                           List document = snapshot.data!.docs.single['givePrivateLessons'];
@@ -213,7 +213,7 @@ class _MeineFaecherState extends State<MeineFaecherPage>
                               return ListTile(
                                 contentPadding: EdgeInsets.only(top:5.0),
                                   leading: SizedBox(
-                                  width: 500.0,
+                                  width: 800.0,
                                   child: RichText(
                                     text: TextSpan(
                                       text: document[i],
@@ -225,12 +225,6 @@ class _MeineFaecherState extends State<MeineFaecherPage>
                                         letterSpacing: 3,
 
                                       ),
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () =>
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) => UserDieNachhilfeGebenPage(subject: document[i]),
-                                            ),
                                     ),
                                   ),
                                   ),

@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:explore/screens/home_page.dart';
 import 'package:explore/utils/authentication.dart';
+import 'package:explore/widgets/AdminBereich.dart';
 import 'package:explore/widgets/Fachauswahl.dart';
 import 'package:explore/widgets/MeineFaecher.dart';
-import 'package:explore/widgets/SchuelerverwaltungAdmin.dart';
 import 'package:explore/widgets/profil.dart';
 import 'package:explore/widgets/Register.dart';
 import 'package:explore/widgets/auth_dialog.dart';
@@ -14,16 +14,14 @@ import 'package:flutter/material.dart';
 
 class TopBarContents extends StatefulWidget {
   final double opacity;
-  String? name;
-  String? email;
-  String? passwort;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  
 
   TopBarContents(this.opacity);
 
   @override
   _TopBarContentsState createState() => _TopBarContentsState();
 }
+
 
 
 class _TopBarContentsState extends State<TopBarContents> {
@@ -63,13 +61,42 @@ class _TopBarContentsState extends State<TopBarContents> {
       },
     );
   }
+  Future<void> _NichtAlsAdminAngemeldet() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Kein Admin'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Um diese Funktion nutzen zu können müssen sie Admin-Rechte besitzen'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Verstanden'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  final store = FirebaseFirestore.instance;
+  List admins = [];
   bool _isProcessing = false;
 
   @override
   Widget build(BuildContext context) {
 
-    final FirebaseAuth _auth = FirebaseAuth.instance;
     User? cuser= _auth.currentUser;
 
     var screenSize = MediaQuery
@@ -122,6 +149,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                             });
                           },
                           onTap: () {
+
                             if(cuser!.uid.isNotEmpty) {
                               showDialog(
                                   context: context,
@@ -175,7 +203,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                                 visible: _isHovering[0],
                                 child: Container(
                                   height: 2,
-                                  width: 20,
+                                  width: 15,
                                   color: Colors.white,
                                 ),
                               )
@@ -222,7 +250,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                                 visible: _isHovering[1],
                                 child: Container(
                                   height: 2,
-                                  width: 20,
+                                  width: 15,
                                   color: Colors.white,
                                 ),
                               )
@@ -239,14 +267,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                             });
                           },
                           onTap: () {
-                            if(cuser!.uid.isNotEmpty) {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) => SchuelerverwaltungPage()
-                              );
-                            }else{
-                              _KeinUserAngemeldet();
-                            }
+
                           },
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -267,7 +288,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                                 visible: _isHovering[2],
                                 child: Container(
                                   height: 2,
-                                  width: 20,
+                                  width: 15,
                                   color: Colors.white,
                                 ),
                               )
@@ -285,7 +306,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                             });
                           },
                           onTap: () {
-                            if(cuser!.uid.isNotEmpty) {
+                            if(cuser!.uid.isNotEmpty&& cuser.email!=null) {
                               showDialog(
                                   context: context,
                                   builder: (context) => ProfilPage()
@@ -313,7 +334,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                                 visible: _isHovering[3],
                                 child: Container(
                                   height: 2,
-                                  width: 20,
+                                  width: 15,
                                   color: Colors.white,
                                 ),
                               )
@@ -329,11 +350,13 @@ class _TopBarContentsState extends State<TopBarContents> {
                   InkWell(
                     onHover: (value) {
                       setState(() {
-                        value ? _isHovering[4] = true : _isHovering[4] = false;
+                        value ? _isHovering[5] = true : _isHovering[5] = false;
                       });
                     },
                     onTap: userEmail == null
                         ? () {
+
+                      print(admins);
                       showDialog(
                         context: context,
                         builder: (context) => AuthDialog(),
@@ -344,7 +367,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                         ? Text(
                       'Anmelden',
                       style: TextStyle(
-                        color: _isHovering[4] ? Colors.black : Colors.white60,
+                        color: _isHovering[5] ? Colors.black : Colors.white60,
                       ),
                     )
                         : Row(
@@ -365,7 +388,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                         Text(
                           name ?? userEmail!,
                             style: TextStyle(
-                            color: _isHovering[4]
+                            color: _isHovering[5]
                                 ? Colors.black
                                 : Colors.white60,
                           ),
