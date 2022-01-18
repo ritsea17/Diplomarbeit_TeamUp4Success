@@ -25,6 +25,8 @@ class _ChangeAbteilungState extends State<ChangeAbteilung> {
   late FocusNode textFocusNodeNewAbteilung;
   bool _isEditingNewAbteilung = false;
 
+  String abteilung = '';
+
 
   @override
   void initState() {
@@ -91,64 +93,6 @@ class _ChangeAbteilungState extends State<ChangeAbteilung> {
                     bottom: 8,
                   ),
                   child: Text(
-                    'Alte Abteilung:',
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      color: Theme.of(context).textTheme.subtitle2!.color,
-                      fontSize: 18,
-                      // fontFamily: 'Montserrat',
-                      fontWeight: FontWeight.bold,
-                      // letterSpacing: 3,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20.0,
-                    right: 20,
-                  ),
-                  child: TextField(
-                    focusNode: textFocusNodeOldAbteilung,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    controller: textControllerOldAbteilung,
-                    autofocus: false,
-                    obscureText: true,
-                    onChanged: (value) {
-                      setState(() {
-                        _isEditingOldAbteilung = true;
-                      });
-                    },
-                    onSubmitted: (value) {
-                      textFocusNodeOldAbteilung.unfocus();
-                      FocusScope.of(context)
-                          .requestFocus(textFocusNodeNewAbteilung);
-                    },
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                      border: new OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.blueGrey[800]!,
-                          width: 3,
-                        ),
-                      ),
-                      filled: true,
-                      hintStyle: new TextStyle(
-                        color: Colors.blueGrey[300],
-                      ),
-                      hintText: "xyz",
-                      fillColor: Colors.white,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 30),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20.0,
-                    bottom: 8,
-                  ),
-                  child: Text(
                     'Neue Abteilung:',
                     textAlign: TextAlign.left,
                     style: TextStyle(
@@ -165,40 +109,42 @@ class _ChangeAbteilungState extends State<ChangeAbteilung> {
                     left: 20.0,
                     right: 20,
                   ),
-                  child: TextField(
-                    focusNode: textFocusNodeNewAbteilung,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    controller: textControllerNewAbteilung,
-                    obscureText: true,
-                    autofocus: false,
-                    onChanged: (value) {
-                      setState(() {
-                        _isEditingNewAbteilung = true;
-                      });
-                    },
-                    onSubmitted: (value) {
-                      textFocusNodeNewAbteilung.unfocus();
-                      FocusScope.of(context)
-                          .requestFocus(textFocusNodeNewAbteilung);
-                    },
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                      border: new OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.blueGrey[800]!,
-                          width: 3,
-                        ),
-                      ),
-                      filled: true,
-                      hintStyle: new TextStyle(
-                        color: Colors.blueGrey[300],
-                      ),
-                      hintText: "xyz",
-                      fillColor: Colors.white,
-                    ),
-                  ),
+                  child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance.collection("department_list").snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData)
+                          const Text("Loading.....");
+                        else {
+                          List<DropdownMenuItem> subjectItems = [];
+                          for (int i = 0; i < snapshot.data!.size; i++) {
+                            String snap = snapshot.data!.docs[i].get('Abteilung');
+                            subjectItems.add(
+                              DropdownMenuItem(
+                                child: Text(snap),
+                                value: "${snap}",
+                              ),
+                            );
+                          }
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              SizedBox(width: 50.0),
+                              DropdownButton(
+                                items: subjectItems,
+                                onChanged: (dynamic subjectValue) {
+                                  setState(() {
+                                    abteilung = subjectValue;
+                                  });
+                                },
+                                value: abteilung,
+                                hint: new Text("Wähle deine Abteilung aus"),
+                              ),
+                            ],
+                          );
+                        }
+                        throw Exception("");
+                      }),
+
                 ),
                 Center(
                   child: IconButton(
@@ -209,6 +155,9 @@ class _ChangeAbteilungState extends State<ChangeAbteilung> {
                     color: Colors.green,
                     onPressed: () {
 
+                      store.collection('users').where('email',isEqualTo: widget.Email).get().then((value) => {
+                        store.collection('users').doc(value.docs.single.get('uid')).update({'department' : textControllerNewAbteilung.text})
+                      });
                       showDialog(
                         context: context,
                         builder: (context) => AdminEditUser(email: widget.Email),

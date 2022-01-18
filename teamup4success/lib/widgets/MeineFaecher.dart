@@ -94,7 +94,7 @@ class _MeineFaecherState extends State<MeineFaecherPage>
       children: [
 
               Container(
-                      padding: EdgeInsets.only(top: 100.0,bottom: 10.0),
+                      padding: EdgeInsets.only(top: 150.0,bottom: 10.0),
                         child: RichText(
 
                           text: TextSpan(
@@ -118,10 +118,20 @@ class _MeineFaecherState extends State<MeineFaecherPage>
                                   .where('uid', isEqualTo:cuser!.uid.toString())
                                       .snapshots(),
                                   builder: (context, snapshot) {
-                                    List document = snapshot.data!.docs
+
+                                    Map document = snapshot.data!.docs
                                         .single['takePrivateLessons'];
+                                    String abteilung = snapshot.data!.docs
+                                        .single['department'];
+                                    String jahrgang = snapshot.data!.docs
+                                        .single['year'];
+                                    List a = jahrgang.split('.');
+                                    String year = a[0];
+                                    List keys = document.keys.toList();
+                                    List values = document.values.toList();
+                                    print(keys);
                                     return ListView.builder(
-                                      itemCount: document.length,
+                                      itemCount: keys.length,
                                       shrinkWrap: true,
                                       padding: EdgeInsets.only(top: 10.0),
                                       itemBuilder: (ctx, i) {
@@ -132,7 +142,7 @@ class _MeineFaecherState extends State<MeineFaecherPage>
                                               width: 800.0,
                                               child: RichText(
                                               text: TextSpan(
-                                                  text: document[i],
+                                                  text: keys[i],
                                                   style: TextStyle(
                                                     color: Colors.black,
                                                     fontSize: 25,
@@ -144,8 +154,9 @@ class _MeineFaecherState extends State<MeineFaecherPage>
                                                   recognizer: TapGestureRecognizer()
                                                     ..onTap = () =>
                                                         showDialog(
+
                                                           context: context,
-                                                          builder: (context) => UserDieNachhilfeGebenPage(subject: document[i]),
+                                                          builder: (context) => UserDieNachhilfeGebenPage(subject: [keys[i],abteilung,year]),
                                                         ),
 
                                               ),
@@ -159,12 +170,11 @@ class _MeineFaecherState extends State<MeineFaecherPage>
                                               iconSize: 30.0,
                                               color: Colors.red,
                                               onPressed: () {
-                                                store.collection("users").doc(cuser.uid).update(
-                                                    {
-                                                      'takePrivateLessons' : FieldValue.arrayRemove([document[i]])
-                                                    }
+                                                store.collection("users").doc(cuser.uid).update({
+                                                 'takePrivateLessons.${keys[i]}' : FieldValue.delete()
+                                                });
 
-                                                );
+
                                               },
                                             ),
                                           ),
@@ -203,10 +213,13 @@ class _MeineFaecherState extends State<MeineFaecherPage>
                             .where('uid', isEqualTo: cuser.uid.toString() )
                             .snapshots(),
                         builder: (context, snapshot) {
-                          List document = snapshot.data!.docs.single['givePrivateLessons'];
+                          Map document = snapshot.data!.docs.single['givePrivateLessons'];
 
+                          List keys = document.keys.toList();
+                          print(document);
+                          print(keys);
                           return ListView.builder(
-                            itemCount: document.length,
+                            itemCount: keys.length,
                             shrinkWrap: true,
                             padding: EdgeInsets.only(top:10.0),
                             itemBuilder: (ctx, i) {
@@ -216,7 +229,7 @@ class _MeineFaecherState extends State<MeineFaecherPage>
                                   width: 800.0,
                                   child: RichText(
                                     text: TextSpan(
-                                      text: document[i],
+                                      text: keys[i],
                                       style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 25,
@@ -237,12 +250,10 @@ class _MeineFaecherState extends State<MeineFaecherPage>
                                     iconSize: 30.0,
                                     color: Colors.red,
                                     onPressed: () {
-                                      store.collection("users").doc(cuser.uid).update(
-                                          {
-                                            'givePrivateLessons' : FieldValue.arrayRemove([document[i]])
-                                          }
+                                      store.collection("users").doc(cuser.uid).update({
+                                        'givePrivateLessons.${keys[i]}' : FieldValue.delete()
+                                      });
 
-                                      );
                                     },
                                   ),
                                   ),

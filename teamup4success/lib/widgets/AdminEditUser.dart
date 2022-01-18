@@ -5,7 +5,6 @@ import 'package:explore/widgets/ChangePassword.dart';
 import 'package:explore/widgets/ChangeUserName.dart';
 import 'package:explore/widgets/ChangeKlasse.dart';
 import 'package:explore/widgets/ChangeAbteilung.dart';
-import 'package:explore/widgets/ChangeEmail.dart';
 import 'package:explore/widgets/web_scrollbar.dart';
 import 'package:explore/widgets/explore_drawer.dart';
 import 'package:explore/widgets/responsive.dart';
@@ -201,7 +200,7 @@ class _AdminEditUserState extends State<AdminEditUser> {
                               builder: (context, snapshot) {// Get the data in the text field
 
 
-                                return Text(snapshot.data!.docs.single['klasse'] ?? 'Keine Klasse',style: TextStyle(
+                                return Text(snapshot.data!.docs.single['year'] ?? 'Kein Jahrgang',style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 30,
                                   fontFamily: 'Montserrat',
@@ -340,20 +339,7 @@ class _AdminEditUserState extends State<AdminEditUser> {
                           ],
                         ),
                       ),
-                      IconButton(
-                        icon: Icon(Icons.create),
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        color: Colors.purple,
-                        iconSize: 30,
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => ChangeEmail(Email : widget.email),
-                          );
 
-                        },
-                      ),
                     ],
 
                   )

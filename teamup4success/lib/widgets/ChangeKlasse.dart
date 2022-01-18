@@ -25,6 +25,8 @@ class _ChangeKlasseState extends State<ChangeKlasse> {
   late FocusNode textFocusNodeNewKlasse;
   bool _isEditingNewKlasse= false;
 
+  String Jahrgang = '';
+
 
   @override
   void initState() {
@@ -91,64 +93,6 @@ class _ChangeKlasseState extends State<ChangeKlasse> {
                     bottom: 8,
                   ),
                   child: Text(
-                    'Alte Klasse:',
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      color: Theme.of(context).textTheme.subtitle2!.color,
-                      fontSize: 18,
-                      // fontFamily: 'Montserrat',
-                      fontWeight: FontWeight.bold,
-                      // letterSpacing: 3,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20.0,
-                    right: 20,
-                  ),
-                  child: TextField(
-                    focusNode: textFocusNodeOldKlasse,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    controller: textControllerOldKlasse,
-                    autofocus: false,
-                    obscureText: true,
-                    onChanged: (value) {
-                      setState(() {
-                        _isEditingOldKlasse = true;
-                      });
-                    },
-                    onSubmitted: (value) {
-                      textFocusNodeOldKlasse.unfocus();
-                      FocusScope.of(context)
-                          .requestFocus(textFocusNodeNewKlasse);
-                    },
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                      border: new OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.blueGrey[800]!,
-                          width: 3,
-                        ),
-                      ),
-                      filled: true,
-                      hintStyle: new TextStyle(
-                        color: Colors.blueGrey[300],
-                      ),
-                      hintText: "xyz",
-                      fillColor: Colors.white,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 30),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20.0,
-                    bottom: 8,
-                  ),
-                  child: Text(
                     'Neue Klasse:',
                     textAlign: TextAlign.left,
                     style: TextStyle(
@@ -165,40 +109,33 @@ class _ChangeKlasseState extends State<ChangeKlasse> {
                     left: 20.0,
                     right: 20,
                   ),
-                  child: TextField(
-                    focusNode: textFocusNodeNewKlasse,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    controller: textControllerNewKlasse,
-                    obscureText: true,
-                    autofocus: false,
-                    onChanged: (value) {
-                      setState(() {
-                        _isEditingNewKlasse = true;
-                      });
-                    },
-                    onSubmitted: (value) {
-                      textFocusNodeNewKlasse.unfocus();
-                      FocusScope.of(context)
-                          .requestFocus(textFocusNodeNewKlasse);
-                    },
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                      border: new OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.blueGrey[800]!,
-                          width: 3,
-                        ),
+                  child:
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      SizedBox(width: 50.0),
+                      DropdownButton(
+                        dropdownColor: Colors.white,
+                        focusColor: Colors.purple,
+                        value: Jahrgang,
+                        onChanged: (String? newValue){
+                          setState((){
+                            Jahrgang = newValue!;
+                          });
+                        },
+                        items: <String>['1. Jahrgang', '2. Jahrgang', '3. Jahrgang', '4. Jahrgang','5. Jahrgang']
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        })
+                            .toList(),
+                        hint: new Text("Wähle deinen Jahrgang aus"),
                       ),
-                      filled: true,
-                      hintStyle: new TextStyle(
-                        color: Colors.blueGrey[300],
-                      ),
-                      hintText: "xyz",
-                      fillColor: Colors.white,
-                    ),
+                    ],
                   ),
+
                 ),
                 Center(
                   child: IconButton(
@@ -208,9 +145,8 @@ class _ChangeKlasseState extends State<ChangeKlasse> {
                     iconSize: 40,
                     color: Colors.green,
                     onPressed: () {
-                      store.collection('users').doc(cuser!.uid).update(
-                          {
-                        'klasse' : textControllerNewKlasse.text
+                      store.collection('users').where('email',isEqualTo: widget.Email).get().then((value) => {
+                        store.collection('users').doc(value.docs.single.get('uid')).update({'year' : Jahrgang})
                       });
                       showDialog(
                         context: context,

@@ -112,6 +112,24 @@ class _TopBarContentsState extends State<TopBarContents> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 10,
+                        bottom: 10,
+                      right:10
+                    ),
+                      child: SizedBox(
+                        height: screenSize.height*0.10,
+                        width: screenSize.width*0.06,
+
+                        child: Image.asset(
+                          'assets/images/LogoNeu.png',
+                          fit: BoxFit.fill,
+
+                      ),
+                    ),
+                  ),
+
               RichText(
                   text: TextSpan(
                       text: 'Team Up 4 Success',
@@ -139,7 +157,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        SizedBox(width: screenSize.width / 8),
+                        SizedBox(width: screenSize.width / 25),
                         InkWell(
                           onHover: (value) {
                             setState(() {
@@ -210,7 +228,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                             ],
                           ),
                         ),
-                        SizedBox(width: screenSize.width / 20),
+                        SizedBox(width: screenSize.width / 25),
                         InkWell(
                           onHover: (value) {
                             setState(() {
@@ -257,7 +275,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                             ],
                           ),
                         ),
-                        SizedBox(width: screenSize.width / 20),
+                        SizedBox(width: screenSize.width / 25),
                         InkWell(
                           onHover: (value) {
                             setState(() {
@@ -295,7 +313,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                             ],
                           ),
                         ),
-                        SizedBox(width: screenSize.width / 20),
+                        SizedBox(width: screenSize.width / 25),
                         InkWell(
                           onHover: (value) {
                             setState(() {
@@ -332,6 +350,70 @@ class _TopBarContentsState extends State<TopBarContents> {
                                 maintainState: true,
                                 maintainSize: true,
                                 visible: _isHovering[3],
+                                child: Container(
+                                  height: 2,
+                                  width: 15,
+                                  color: Colors.white,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: screenSize.width / 25),
+                        InkWell(
+                          onHover: (value) {
+                            setState(() {
+                              store.collection('admins').doc('adminemails').get().then((value) =>{
+                                value.data()!.forEach((key, value) {
+
+                                  admins=value;
+                                })
+                              });
+                              value
+                                  ? _isHovering[4] = true
+                                  : _isHovering[4] = false;
+
+                            });
+                          },
+                          onTap: () {
+                            store.collection('admins').doc('adminemails').get().then((value) =>{
+                              value.data()!.forEach((key, value) {
+
+                                admins=value;
+                              })
+                            });
+                            print(admins);
+                            if(cuser!.uid!=null) {
+                              if(admins.contains(cuser.email)) {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => Adminbereich()
+
+                                );
+                              }else{
+                                _NichtAlsAdminAngemeldet();
+                              }
+                            }else{
+                              _KeinUserAngemeldet();
+                            }
+                          },
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Administratorbereich',
+                                style: TextStyle(
+                                  color: _isHovering[4]
+                                      ? Colors.blue[200]
+                                      : Colors.white,
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              Visibility(
+                                maintainAnimation: true,
+                                maintainState: true,
+                                maintainSize: true,
+                                visible: _isHovering[4],
                                 child: Container(
                                   height: 2,
                                   width: 15,

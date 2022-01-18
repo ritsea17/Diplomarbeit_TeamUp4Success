@@ -3,6 +3,7 @@ import 'package:explore/screens/home_page.dart';
 import 'package:explore/utils/authentication.dart';
 import 'package:explore/widgets/AdminBereich.dart';
 import 'package:explore/widgets/AdminEditUser.dart';
+import 'package:explore/widgets/AllAdmins.dart';
 import 'package:explore/widgets/Register.dart';
 import 'package:explore/widgets/profil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -135,14 +136,14 @@ class _AddAdminState extends State<AddAdmin> {
                     color: Colors.green,
                     onPressed: () {
 
-                      final ref=store.collection('admins').doc('2ateEChEcqnI1gIFw7Hh');
+                      final ref=store.collection('admins').doc('adminemails');
                       ref.update({
-                      'emails' : FieldValue.arrayUnion([textControllerAdmin.text])
+                      'email' : FieldValue.arrayUnion([textControllerAdmin.text])
                       });
 
                       showDialog(
                         context: context,
-                        builder: (context) => Adminbereich(),
+                        builder: (context) => AllAdmins(),
                       );
                     },
                   ),

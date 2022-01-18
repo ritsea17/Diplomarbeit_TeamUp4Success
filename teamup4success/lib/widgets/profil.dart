@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
+import 'package:explore/screens/home_page.dart';
 import 'package:explore/utils/authentication.dart';
 import 'package:explore/widgets/ChangePassword.dart';
 import 'package:explore/widgets/ChangeUserName.dart';
@@ -24,6 +25,7 @@ class ProfilPage extends StatefulWidget {
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 User? cuser= _auth.currentUser;
+
 final store = FirebaseFirestore.instance;
 
 
@@ -209,9 +211,9 @@ class _ProfilPageState extends State<ProfilPage> {
                                 .snapshots(),
                             builder: (context, snapshot) {
                               final document = snapshot.data; // Get the document snapshot
-                              final text = document?.data()?['klasse']; // Get the data in the text field
+                              final text = document?.data()?['year']; // Get the data in the text field
 
-                              return Text(text ?? 'Keine Klasse', style: TextStyle(
+                              return Text(text ?? 'Kein Jahrgang', style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 30,
                                 fontFamily: 'Montserrat',
@@ -258,7 +260,7 @@ class _ProfilPageState extends State<ProfilPage> {
                                 .snapshots(),
                             builder: (context, snapshot) {
                               final document = snapshot.data; // Get the document snapshot
-                              final text = document?.data()?['abteilung']; // Get the data in the text field
+                              final text = document?.data()?['department']; // Get the data in the text field
 
                               return Text(text ?? 'Keine Abteilung', style: TextStyle(
                                 color: Colors.black,
@@ -332,8 +334,34 @@ class _ProfilPageState extends State<ProfilPage> {
                     ],
                   )
               ),
+              FloatingActionButton(
+                onPressed: () async{
+
+                  store.collection('users').doc(cuser!.uid).delete();
+                  cuser!.delete();
+                  await signOut().then((result) {
+                    print(result);
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        fullscreenDialog: true,
+                        builder: (context) => HomePage(),
+                      ),
+                    );
+                  }).catchError((error) {
+                    print('Sign Out Error: $error');
+                  });
+                  setState(() {
+                  });
+
+                },
+                backgroundColor: Colors.red,
+                child: const Icon(Icons.delete),
+
+              ),
             ],
+
           ),
+
         ),
       ),
     );

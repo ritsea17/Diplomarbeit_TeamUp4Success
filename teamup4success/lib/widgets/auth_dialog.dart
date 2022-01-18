@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/screens/home_page.dart';
-import 'package:explore/screens/home_page_admin.dart';
 import 'package:explore/utils/authentication.dart';
 import 'package:explore/widgets/Register.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -106,17 +105,24 @@ class _AuthDialogState extends State<AuthDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Center(
+            Padding(
+            padding: const EdgeInsets.only(
+              top: 10,
+              bottom: 10
+            ),
+                child: Center(
                     child: SizedBox(
                       height: screenSize.height*0.12,
                       width: screenSize.width*0.08,
 
                       child: Image.asset(
-                        'assets/images/Logo.png',
+                        'assets/images/LogoNeu.png',
                         fit: BoxFit.fill,
+
                       ),
                     ),
                 ),
+            ),
                 Center(
 
                   child: Text(
@@ -260,6 +266,22 @@ class _AuthDialogState extends State<AuthDialog> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(
+                    top:20.0,
+                    left: 15.0,
+                    right: 20,
+                  ),
+                  child: TextButton(
+                      style: TextButton.styleFrom(
+                        primary: Colors.purple,
+                      ),
+                      child: Text('Passwort vergessen?'),
+                      onPressed: () {
+                        _auth.sendPasswordResetEmail(email: textControllerEmail.text);
+                      }
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
                     left: 20.0,
                     right: 20,
                     top:20,
@@ -310,27 +332,9 @@ class _AuthDialogState extends State<AuthDialog> {
                                       loginStringColor = Colors.green;
 
                                     });
-                                      store.collection('admins').doc('2ateEChEcqnI1gIFw7Hh').get().then((value) =>{
-                                      value.data()!.forEach((key, value) {
-                                        admins=value;
-                                        })
-                                        });
 
-                                      if(admins.contains(cuser!.email)) {
-                                      Future.delayed(
-                                          Duration(milliseconds: 500),
-                                              () {
-                                            Navigator.of(context).pop();
-                                            Navigator.of(context)
-                                                .pushReplacement(
-                                                MaterialPageRoute(
-                                                  fullscreenDialog: true,
-                                                  builder: (context) =>
-                                                      HomePageAdmin(),
-                                                ));
-                                          });
 
-                                  }else{
+
                                         Future.delayed(
                                             Duration(milliseconds: 500),
                                                 () {
@@ -343,7 +347,10 @@ class _AuthDialogState extends State<AuthDialog> {
                                                         HomePage(),
                                                   ));
                                             });
-                                      }
+                                    var snap = store.collection('users').doc(cuser!.uid).snapshots().isEmpty;
+                                    if(snap == true){
+                                      cuser.delete();
+                                    }
     }
                                 }).catchError((error) {
                                   print('Login Error: $error');

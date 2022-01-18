@@ -139,7 +139,8 @@ class _AddDepartmentState extends State<AddDepartment> {
                         'Abteilung' : textControllerDepartment.text
                       });
                       store.collection('subject_list').doc(textControllerDepartment.text).set({
-                        'department' : textControllerDepartment.text
+                        'department' : textControllerDepartment.text,
+                        'subject' : []
                       });
 
                       showDialog(

@@ -103,7 +103,7 @@ class _AllDepartmentsState extends State<AllDepartments>
           child: Column(
             children: [
               Container(
-                  padding: EdgeInsets.only(top: 100.0,bottom: 10.0),
+                  padding: EdgeInsets.only(top: 150.0,bottom: 10.0),
                   child: RichText(
 
                     text: TextSpan(

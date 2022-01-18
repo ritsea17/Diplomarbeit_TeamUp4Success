@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/screens/home_page.dart';
-import 'package:explore/screens/home_page_admin.dart';
 import 'package:explore/utils/authentication.dart';
-import 'package:explore/widgets/auth_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -19,6 +17,7 @@ class _AuthDialogState extends State<RegisterDialog> {
   late DocumentReference ref;
   var itemsList =['Informatik', 'Automatisierung', 'Mechatronik', 'Robotik'];
   String abteilung = 'Bitte Abteilung auswählen';
+  String Jahrgang = 'Bitte Jahrgang wählen';
   late TextEditingController textControllerEmail;
   late FocusNode textFocusNodeEmail;
   bool _isEditingEmail = false;
@@ -47,6 +46,7 @@ class _AuthDialogState extends State<RegisterDialog> {
 
 
   List admins=[];
+  List departments=[];
 
 
   String? _validateEmail(String value) {
@@ -148,14 +148,21 @@ class _AuthDialogState extends State<RegisterDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Center(
-                  child: SizedBox(
-                    height: screenSize.height*0.12,
-                    width: screenSize.width*0.08,
+                Padding(
+                  padding: const EdgeInsets.only(
+                      top: 10,
+                      bottom: 10
+                  ),
+                  child: Center(
+                    child: SizedBox(
+                      height: screenSize.height*0.12,
+                      width: screenSize.width*0.08,
 
-                    child: Image.asset(
-                      'assets/images/Logo.png',
-                      fit: BoxFit.fill,
+                      child: Image.asset(
+                        'assets/images/LogoNeu.png',
+                        fit: BoxFit.fill,
+
+                      ),
                     ),
                   ),
                 ),
@@ -386,25 +393,41 @@ class _AuthDialogState extends State<RegisterDialog> {
                     left: 20.0,
                     right: 20,
                   ),
-                  child:
-                  DropdownButton(
-                    dropdownColor: Colors.white,
-                    focusColor: Colors.purple,
-                    value: abteilung,
-                    onChanged: (String? newValue){
-                     setState((){
-                       abteilung = newValue!;
-                     });
-                     },
-                      items: <String>['Informatik', 'Automatiesierung', 'Mechatronik', 'Robotik']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      })
-                          .toList(),
-                  ),
+                  child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance.collection("department_list").snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData)
+                          const Text("Loading.....");
+                        else {
+                          List<DropdownMenuItem> subjectItems = [];
+                          for (int i = 0; i < snapshot.data!.size; i++) {
+                            String snap = snapshot.data!.docs[i].get('Abteilung');
+                            subjectItems.add(
+                              DropdownMenuItem(
+                                child: Text(snap),
+                                value: "${snap}",
+                              ),
+                            );
+                          }
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              SizedBox(width: 50.0),
+                              DropdownButton(
+                                items: subjectItems,
+                                onChanged: (dynamic subjectValue) {
+                                  setState(() {
+                                    abteilung = subjectValue;
+                                  });
+                                },
+                                value: abteilung,
+                                hint: new Text("Wähle deine Abteilung aus"),
+                              ),
+                            ],
+                          );
+                        }
+                        throw Exception("");
+                      }),
 
                 ),
                 Padding(
@@ -413,7 +436,7 @@ class _AuthDialogState extends State<RegisterDialog> {
                     bottom: 8,
                   ),
                   child: Text(
-                    'Klasse:',
+                    'Jahrgang:',
                     textAlign: TextAlign.left,
                     style: TextStyle(
                       color: Theme.of(context).textTheme.subtitle2!.color,
@@ -429,45 +452,33 @@ class _AuthDialogState extends State<RegisterDialog> {
                     left: 20.0,
                     right: 20,
                   ),
-                  child: TextField(
-                    focusNode: textFocusNodeKlasse,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.done,
-                    controller: textControllerKlasse,
-                    obscureText: false,
-                    autofocus: false,
-                    onChanged: (value) {
-                      setState(() {
-                        _isEditingKlasse = true;
+                  child:
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                      SizedBox(width: 50.0),
+                  DropdownButton(
+                    dropdownColor: Colors.white,
+                    focusColor: Colors.purple,
+                    value: Jahrgang,
+                    onChanged: (String? newValue){
+                      setState((){
+                        Jahrgang = newValue!;
                       });
                     },
-                    onSubmitted: (value) {
-                      textFocusNodeKlasse.unfocus();
-                    },
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                      border: new OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.blueGrey[800]!,
-                          width: 3,
-                        ),
-                      ),
-                      filled: true,
-                      hintStyle: new TextStyle(
-                        color: Colors.blueGrey[300],
-                      ),
-                      hintText: "1AHIF",
-                      fillColor: Colors.white,
-                      errorText: _isEditingKlasse
-                          ? _validateKlasse(textControllerBenutzername.text)
-                          : null,
-                      errorStyle: TextStyle(
-                        fontSize: 12,
-                        color: Colors.redAccent,
-                      ),
-                    ),
+                    items: <String>['1. Jahrgang', '2. Jahrgang', '3. Jahrgang', '4. Jahrgang','5. Jahrgang']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    })
+                        .toList(),
+                    hint: new Text("Wähle deinen Jahrgang aus"),
                   ),
+                      ],
+                  ),
+
                 ),
                 Padding(
                   padding: const EdgeInsets.all(10.0),
@@ -516,27 +527,11 @@ class _AuthDialogState extends State<RegisterDialog> {
                                       loginStringColor = Colors.green;
                                     });
 
-                                    store.collection('admins').doc('2ateEChEcqnI1gIFw7Hh').get().then((value) =>{
-                                      value.data()!.forEach((key, value) {
-                                        admins=value;
-                                      })
-                                    });
 
-                                    if(admins.contains(cuser!.email)) {
-                                      Future.delayed(
-                                          Duration(milliseconds: 500),
-                                              () {
-                                            Navigator.of(context).pop();
-                                            Navigator.of(context)
-                                                .pushReplacement(
-                                                MaterialPageRoute(
-                                                  fullscreenDialog: true,
-                                                  builder: (context) =>
-                                                      HomePageAdmin(),
-                                                ));
-                                          });
 
-                                    }else{
+
+
+
                                       Future.delayed(
                                           Duration(milliseconds: 500),
                                               () {
@@ -549,7 +544,6 @@ class _AuthDialogState extends State<RegisterDialog> {
                                                       HomePage(),
                                                 ));
                                           });
-                                    }
                                   }
                                 }).catchError((error) {
                                   print('Login Error: $error');
@@ -643,7 +637,7 @@ class _AuthDialogState extends State<RegisterDialog> {
                                           'display_name' : textControllerBenutzername.text,
                                           'email' : textControllerEmail.text,
                                           'department' : abteilung,
-                                          'klasse' : textControllerKlasse.text,
+                                          'year' : textControllerKlasse.text,
                                           'uid': uid.toString()
                                         });
 

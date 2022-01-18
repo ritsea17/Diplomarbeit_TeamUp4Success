@@ -97,7 +97,7 @@ class _AllAdminsState extends State<AllAdmins>
           child: Column(
             children: [
               Container(
-                  padding: EdgeInsets.only(top: 100.0,bottom: 10.0),
+                  padding: EdgeInsets.only(top: 150.0,bottom: 10.0),
                   child: RichText(
 
                     text: TextSpan(
@@ -120,7 +120,7 @@ class _AllAdminsState extends State<AllAdmins>
                                 .snapshots(),
                             builder: (context, snapshot) {
 
-                              List document = snapshot.data!.docs.single['emails'];
+                              List document = snapshot.data!.docs.single['email'];
                               return ListView.builder(
                                 itemCount: document.length,
                                 shrinkWrap: true,
@@ -144,9 +144,9 @@ class _AllAdminsState extends State<AllAdmins>
                                       iconSize: 30.0,
                                       color: Colors.red,
                                       onPressed: () {
-                                        store.collection("admins").doc('2ateEChEcqnI1gIFw7Hh').update(
+                                        store.collection("admins").doc('adminemails').update(
                                             {
-                                              'emails' : FieldValue.arrayRemove([document[i]])
+                                              'email' : FieldValue.arrayRemove([document[i]])
                                             });
                                       },
                                     ),

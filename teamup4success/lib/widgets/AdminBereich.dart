@@ -111,7 +111,7 @@ class _AdminbereichState extends State<Adminbereich>
                   children: [
 
                     Container(
-                        padding: EdgeInsets.only(top: 100.0,bottom: 10.0),
+                        padding: EdgeInsets.only(top: 150.0,bottom: 10.0),
                         child: TextButton(
                           child: Text('Alle Schüler/innen und Lehrer/innen anzeigen:',style: TextStyle(
                             fontSize: 30,

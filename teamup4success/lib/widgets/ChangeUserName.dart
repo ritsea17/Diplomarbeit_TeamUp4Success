@@ -87,63 +87,6 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                     bottom: 8,
                   ),
                   child: Text(
-                    'Alter Benutzername:',
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      color: Theme.of(context).textTheme.subtitle2!.color,
-                      fontSize: 18,
-                      // fontFamily: 'Montserrat',
-                      fontWeight: FontWeight.bold,
-                      // letterSpacing: 3,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20.0,
-                    right: 20,
-                  ),
-                  child: TextField(
-                    focusNode: textFocusNodeOldUsername,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    controller: textControllerOldUsername,
-                    autofocus: false,
-                    onChanged: (value) {
-                      setState(() {
-                        _isEditingOldUsername = true;
-                      });
-                    },
-                    onSubmitted: (value) {
-                      textFocusNodeOldUsername.unfocus();
-                      FocusScope.of(context)
-                          .requestFocus(textFocusNodeNewUsername);
-                    },
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                      border: new OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.blueGrey[800]!,
-                          width: 3,
-                        ),
-                      ),
-                      filled: true,
-                      hintStyle: new TextStyle(
-                        color: Colors.blueGrey[300],
-                      ),
-                      hintText: "xyz",
-                      fillColor: Colors.white,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 30),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20.0,
-                    bottom: 8,
-                  ),
-                  child: Text(
                     'Neuer Benutzername:',
                     textAlign: TextAlign.left,
                     style: TextStyle(

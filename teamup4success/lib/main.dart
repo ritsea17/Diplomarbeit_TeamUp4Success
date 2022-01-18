@@ -18,12 +18,13 @@ class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 }
-
+String email = '';
 class _MyAppState extends State<MyApp> {
   Future getUserInfo() async {
     await getUser();
     setState(() {});
     print(uid);
+    email = userEmail.toString();
   }
 
   @override

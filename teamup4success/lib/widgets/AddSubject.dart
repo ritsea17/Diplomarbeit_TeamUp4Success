@@ -11,8 +11,8 @@ import 'package:flutter/material.dart';
 
 
 class AddSubject extends StatefulWidget {
-  const AddSubject({Key? key, required this.id}) : super(key: key);
-  final String id;
+  const AddSubject({Key? key, required this.department}) : super(key: key);
+  final String department;
   @override
   _AddSubjectState createState() => _AddSubjectState();
 }
@@ -138,11 +138,14 @@ class _AddSubjectState extends State<AddSubject> {
                     color: Colors.green,
                     onPressed: () {
 
-                      print(widget.id);
-                      final ref=store.collection('subject_list').doc(widget.id);
+                      final ref=store.collection('subject_list').doc(widget.department);
                       ref.update({
                         'subject' : FieldValue.arrayUnion([textControllerSubject.text])
                       });
+                      showDialog(
+                        context: context,
+                        builder: (context) => AddDeleteSubject(department : widget.department),
+                      );
 
                     },
                   ),

@@ -102,7 +102,7 @@ class _AllStudentsState extends State<AllStudents>
           child: Column(
             children: [
               Container(
-                  padding: EdgeInsets.only(top: 100.0,bottom: 10.0),
+                  padding: EdgeInsets.only(top: 150.0,bottom: 10.0),
                   child: RichText(
 
                     text: TextSpan(
@@ -155,11 +155,11 @@ class _AllStudentsState extends State<AllStudents>
                                       ),),
                                     subtitle: Text(
                                       snapshot.data!.docs[i].get('display_name') , style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 20,
-                                      fontFamily: 'Montserrat',
-                                      fontWeight: FontWeight.w400,
-                                      letterSpacing: 3,
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.w400,
+                                  letterSpacing: 3,
                                     ),),
                                     trailing:
                                     IconButton(
@@ -169,7 +169,9 @@ class _AllStudentsState extends State<AllStudents>
                                       iconSize: 30.0,
                                       color: Colors.red,
                                       onPressed: () {
-                                        store.collection('users').doc(snapshot.data!.docs[i].get('Abteilung')).delete();
+                                        store.collection('users').doc(snapshot.data!.docs[i].get('uid')).delete();
+                                        print(snapshot.data!.docs[i].get('uid'));
+
                                       },
                                     ),
 

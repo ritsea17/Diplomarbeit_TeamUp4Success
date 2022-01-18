@@ -88,64 +88,6 @@ class _ChangePasswordState extends State<ChangePassword> {
                     bottom: 8,
                   ),
                   child: Text(
-                    'Altes Passwort:',
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      color: Theme.of(context).textTheme.subtitle2!.color,
-                      fontSize: 18,
-                      // fontFamily: 'Montserrat',
-                      fontWeight: FontWeight.bold,
-                      // letterSpacing: 3,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20.0,
-                    right: 20,
-                  ),
-                  child: TextField(
-                    focusNode: textFocusNodeOldPassword,
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    controller: textControllerOldPassword,
-                    autofocus: false,
-                    obscureText: true,
-                    onChanged: (value) {
-                      setState(() {
-                        _isEditingOldPassword = true;
-                      });
-                    },
-                    onSubmitted: (value) {
-                      textFocusNodeOldPassword.unfocus();
-                      FocusScope.of(context)
-                          .requestFocus(textFocusNodeNewPassword);
-                    },
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                      border: new OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide(
-                          color: Colors.blueGrey[800]!,
-                          width: 3,
-                        ),
-                      ),
-                      filled: true,
-                      hintStyle: new TextStyle(
-                        color: Colors.blueGrey[300],
-                      ),
-                      hintText: "xyz",
-                      fillColor: Colors.white,
-                      ),
-                    ),
-                  ),
-                SizedBox(height: 30),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20.0,
-                    bottom: 8,
-                  ),
-                  child: Text(
                     'Neues Passwort:',
                     textAlign: TextAlign.left,
                     style: TextStyle(

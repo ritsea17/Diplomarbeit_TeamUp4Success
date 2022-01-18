@@ -105,7 +105,7 @@ late String sid;
           child: Column(
             children: [
               Container(
-                  padding: EdgeInsets.only(top: 100.0,bottom: 10.0),
+                  padding: EdgeInsets.only(top: 150.0,bottom: 10.0),
                   child: RichText(
 
                     text: TextSpan(
@@ -129,8 +129,6 @@ late String sid;
                             builder: (context, snapshot) {
 
                               List document = snapshot.data!.docs.single['subject'];
-                              String id = snapshot.data!.docs.single['id'].toString().trim();
-                              sid=id;
                               return ListView.builder(
                                 itemCount: document.length,
                                 shrinkWrap: true,
@@ -154,7 +152,7 @@ late String sid;
                                       iconSize: 30.0,
                                       color: Colors.red,
                                       onPressed: () {
-                                        store.collection("subject_list").doc(id).update(
+                                        store.collection("subject_list").doc(widget.department).update(
                                             {
                                               'subject' : FieldValue.arrayRemove([document[i]])
                                             });
@@ -176,7 +174,7 @@ late String sid;
 
                   showDialog(
                     context: context,
-                    builder: (context) => AddSubject(id : sid),
+                    builder: (context) => AddSubject(department : widget.department),
                   );
                 },
                 backgroundColor: Colors.green,

@@ -12,7 +12,8 @@ import 'package:explore/screens/home_page.dart';
 
 class UserDieNachhilfeGebenPage extends StatefulWidget {
   const UserDieNachhilfeGebenPage({Key? key, required this.subject}) : super(key: key);
-  final String subject;
+  final List subject;
+
   @override
   _UserDieNachhilfeGebenState createState() => _UserDieNachhilfeGebenState();
 }
@@ -44,14 +45,12 @@ class _UserDieNachhilfeGebenState extends State<UserDieNachhilfeGebenPage>
   @override
   Widget build(BuildContext context) {
 
+
     final FirebaseAuth _auth = FirebaseAuth.instance;
     User? cuser= _auth.currentUser;
     final store = FirebaseFirestore.instance;
 
-    List subjects = [widget.subject];
-
     print(widget.subject);
-    print(subjects[0]);
     var screenSize = MediaQuery.of(context).size;
     _opacity = _scrollPosition < screenSize.height * 0.40
         ? _scrollPosition / (screenSize.height * 0.40)
@@ -96,7 +95,7 @@ class _UserDieNachhilfeGebenState extends State<UserDieNachhilfeGebenPage>
             children: [
 
               Container(
-                  padding: EdgeInsets.only(top: 100.0,bottom: 10.0),
+                  padding: EdgeInsets.only(top: 150.0,bottom: 10.0),
                   child: RichText(
 
                     text: TextSpan(
@@ -115,20 +114,52 @@ class _UserDieNachhilfeGebenState extends State<UserDieNachhilfeGebenPage>
                           // Use StreamBuilder to listen on the changes of your Firestore document.
                           child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                             stream: FirebaseFirestore.instance
-                                .collection("users").where('givePrivateLessons', arrayContainsAny: subjects)
+                                .collection("users").where('department',isEqualTo: widget.subject[1])
                                 .snapshots(),
                             builder: (context, snapshot) {
+                            Map lessons = {};
+                            List name = [];
+                            List email=[];
+                            Map details = {};
+                            List teacherAndYears= [];
+                              for(int i = 0;i<snapshot.data!.docs.length-1;i++) {
+                                lessons = snapshot.data!.docs[i].get(
+                                    'givePrivateLessons');
+                                if(lessons.containsKey(widget.subject[0])){
+                                  String years=snapshot.data!.docs[i].get(
+                                      'givePrivateLessons.${widget.subject[0]}.${'providedYears'}');
+                                  print('!!getYears!!');
+                                  print(years);
+                                  print('!!getYears!!');
+                                  List s = years.split(';');
+                                  if(s.contains(widget.subject[2])){
+                                    name.add(snapshot.data!.docs[i].get(
+                                        'display_name'));
+                                    email.add(snapshot.data!.docs[i].get(
+                                        'email'));
+                                    details = snapshot.data!.docs[i].get(
+                                        'givePrivateLessons.${widget.subject[0]}');
+                                    teacherAndYears.add(details.values.toList());
+                                  }
 
+                                }
+                                print('in for');
+                                print(name);
+                                print(email);
+                                print(teacherAndYears);
+                              };
+
+                              
 
                               return ListView.builder(
-                                itemCount: snapshot.data!.docs.length,
+                                itemCount: name.length ?? 1,
                                 shrinkWrap: true,
                                 padding: EdgeInsets.only(top: 10.0),
                                 itemBuilder: (ctx, i) {
                                   return ListTile(
                                       leading: Icon(Icons.account_circle,size: 40,),
                                       title: Text(
-                                        snapshot.data!.docs[i].get('display_name').toString() , style: TextStyle(
+                                        name[i] ?? 'Keine Nachhilfe vorhanden' , style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 25,
                                         fontFamily: 'Montserrat',
@@ -136,11 +167,19 @@ class _UserDieNachhilfeGebenState extends State<UserDieNachhilfeGebenPage>
                                         letterSpacing: 3,
                                       ),),
                                       subtitle: Text(
-                                        snapshot.data!.docs[i].get('email').toString() , style: TextStyle(
+                                       email[i] ?? 'Keine Nachhilfe vorhanden' , style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontFamily: 'Montserrat',
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 3,
+                                      ),),
+                                      trailing: Text(
+                                       'Professor/in: '+teacherAndYears[i][0] ?? 'Keine Nachhilfe vorhanden' , style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 20,
                                         fontFamily: 'Montserrat',
-                                        fontWeight: FontWeight.w400,
+                                        fontWeight: FontWeight.bold,
                                         letterSpacing: 3,
                                       ),),
 
