@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/utils/authentication.dart';
 import 'package:explore/widgets/Register.dart';
-import 'package:explore/widgets/auth_dialog.dart';
+import 'package:explore/widgets/Login.dart';
+import 'package:explore/widgets/explore_drawer.dart';
+import 'package:explore/widgets/web_scrollbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,22 +11,14 @@ import 'package:flutter/rendering.dart';
 import 'package:explore/widgets/responsive.dart';
 import 'package:explore/widgets/top_bar_contents.dart';
 
-class FachauswahlPage extends StatelessWidget {
+class FachauswahlPage extends StatefulWidget {
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: DropDown(),
-      ),
-    );
-  }
-}
-class DropDown extends StatefulWidget {
-  @override
-  DropDownWidget createState() => DropDownWidget();
+  _FachauswahlState createState() => _FachauswahlState();
 }
 
-class DropDownWidget extends State {
+class _FachauswahlState extends State<FachauswahlPage>
+{
 
 
   int dropdownGegenstand = 1;
@@ -44,10 +38,19 @@ class DropDownWidget extends State {
   var selectedAbt;
   String jahrgang = '';
 
-  _scrollListener() {
+  _scrollListener()
+  {
     setState(() {
       _scrollPosition = _scrollController.position.pixels;
     });
+  }
+
+  @override
+  void initState()
+  {
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
+    super.initState();
   }
 
   Map addMap()
@@ -92,9 +95,17 @@ class DropDownWidget extends State {
         preferredSize: Size(screenSize.width, 1000),
         child: TopBarContents(_opacity),
       ),
-      body: Center(
-        child:
-        Column(children: <Widget>[
+    drawer: ExploreDrawer(),
+    body: WebScrollbar(
+    color: Colors.blueGrey,
+    backgroundColor: Colors.blueGrey.withOpacity(0.3),
+    width: 10,
+    heightFraction: 0.3,
+    controller: _scrollController,
+    child: SingleChildScrollView(
+    controller: _scrollController,
+    physics: ClampingScrollPhysics(),
+    child:Column(children: <Widget>[
           new Container(
             margin: const EdgeInsets.only(top: 150.0),
             child: Text(
@@ -316,7 +327,7 @@ class DropDownWidget extends State {
 
         ]),
       ),
-    );
+    ));
   }
   void saveData()
   {

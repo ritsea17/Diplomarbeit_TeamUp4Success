@@ -114,21 +114,15 @@ class _MeineFaecherState extends State<MeineFaecherPage>
                                 // Use StreamBuilder to listen on the changes of your Firestore document.
                                 child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                                   stream: FirebaseFirestore.instance
-                                      .collection("users")
-                                  .where('uid', isEqualTo:cuser!.uid.toString())
+                                      .collection("users").where('uid', isEqualTo:cuser!.uid.toString())
                                       .snapshots(),
                                   builder: (context, snapshot) {
-
-                                    Map document = snapshot.data!.docs
-                                        .single['takePrivateLessons'];
-                                    String abteilung = snapshot.data!.docs
-                                        .single['department'];
-                                    String jahrgang = snapshot.data!.docs
-                                        .single['year'];
+                                    Map document = snapshot.data!.docs.single['takePrivateLessons'];
+                                    String abteilung = snapshot.data!.docs.single['department'];
+                                    String jahrgang = snapshot.data!.docs.single['year'];
                                     List a = jahrgang.split('.');
                                     String year = a[0];
                                     List keys = document.keys.toList();
-                                    List values = document.values.toList();
                                     print(keys);
                                     return ListView.builder(
                                       itemCount: keys.length,

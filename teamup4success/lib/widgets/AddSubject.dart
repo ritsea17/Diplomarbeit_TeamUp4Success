@@ -22,7 +22,7 @@ class _AddSubjectState extends State<AddSubject> {
   late TextEditingController textControllerSubject;
   late FocusNode textFocusNodeSubject;
   bool _isEditingSubject = false;
-
+bool isChecked= false;
 
 
 
@@ -67,7 +67,7 @@ class _AddSubjectState extends State<AddSubject> {
                     width: screenSize.width*0.08,
 
                     child: Image.asset(
-                      'assets/images/Logo.png',
+                      'assets/images/TU4SIcon.png',
                       fit: BoxFit.fill,
                     ),
                   ),
@@ -129,6 +129,29 @@ class _AddSubjectState extends State<AddSubject> {
                     ),
                   ),
                 ),
+                Padding(
+                    padding: const EdgeInsets.only(
+                      top:10,
+                      left: 20.0,
+                      right: 20,
+                    ),
+                    child: Text('Vertiefungsfach: ')
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 20.0,
+                    right: 20,
+                  ),
+                  child: Checkbox(
+                    checkColor: Colors.purple,
+                    value: isChecked,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        isChecked = value!;
+                      });
+                    },
+                  ),
+                ),
                 Center(
                   child: IconButton(
                     icon: Icon(Icons.arrow_forward),
@@ -139,9 +162,17 @@ class _AddSubjectState extends State<AddSubject> {
                     onPressed: () {
 
                       final ref=store.collection('subject_list').doc(widget.department);
-                      ref.update({
-                        'subject' : FieldValue.arrayUnion([textControllerSubject.text])
-                      });
+                      if(isChecked==true){
+                        ref.update({
+                          'elective': FieldValue.arrayUnion(
+                              [textControllerSubject.text])
+                        });
+                      }else {
+                        ref.update({
+                          'subject': FieldValue.arrayUnion(
+                              [textControllerSubject.text])
+                        });
+                      }
                       showDialog(
                         context: context,
                         builder: (context) => AddDeleteSubject(department : widget.department),

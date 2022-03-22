@@ -63,7 +63,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                     width: screenSize.width*0.08,
 
                     child: Image.asset(
-                      'assets/images/Logo.png',
+                      'assets/images/TU4SIcon.png',
                       fit: BoxFit.fill,
                     ),
                   ),

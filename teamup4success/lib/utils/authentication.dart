@@ -5,14 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
-final GoogleSignIn googleSignIn = GoogleSignIn();
 
 String? uid;
 String? name;
 String? userEmail;
 String? imageUrl;
-String? Abteilung;
-String? Klasse;
 bool? verified;
 String? Password;
 
@@ -29,30 +26,22 @@ Future getUser() async {
   if (authSignedIn == true) {
     if (user != null) {
       uid = user.uid;
-      name = user.displayName;
       userEmail = user.email;
-      imageUrl = user.photoURL;
     }
   }
   return user;
 }
 
-/// For authenticating user using Google Sign In
-/// with Firebase Authentication API.
-///
-/// Retrieves some general user related information
 
 
 Future<User?> registerWithEmailPassword(String email, String password) async {
   await Firebase.initializeApp();
   User? user;
-
   try {
     UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
-
     user = userCredential.user;
     if (user != null) {
       uid = user.uid;
@@ -69,9 +58,7 @@ Future<User?> registerWithEmailPassword(String email, String password) async {
   } catch (e) {
     print(e);
   }
-
   user!.sendEmailVerification();
-
   return user;
 }
 
@@ -79,19 +66,15 @@ Future<User?> signInWithEmailPassword(String email, String password) async {
   await Firebase.initializeApp();
   User? user;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
       user = userCredential.user;
-
       if (user != null) {
         uid = user.uid;
         userEmail = user.email;
-        name = user.displayName;
-
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('auth', true);
         if(user.emailVerified){
@@ -109,9 +92,6 @@ Future<User?> signInWithEmailPassword(String email, String password) async {
         print('Wrong password provided.');
       }
     }
-
-
-
   return user;
 }
 

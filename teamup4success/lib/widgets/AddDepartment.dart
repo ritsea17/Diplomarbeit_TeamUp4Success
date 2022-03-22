@@ -20,7 +20,7 @@ class _AddDepartmentState extends State<AddDepartment> {
   late TextEditingController textControllerDepartment;
   late FocusNode textFocusNodeDepartment;
   bool _isEditingDepartment = false;
-
+  bool isChecked = false;
 
 
 
@@ -65,7 +65,7 @@ class _AddDepartmentState extends State<AddDepartment> {
                     width: screenSize.width*0.08,
 
                     child: Image.asset(
-                      'assets/images/Logo.png',
+                      'assets/images/TU4SIcon.png',
                       fit: BoxFit.fill,
                     ),
                   ),
@@ -127,6 +127,29 @@ class _AddDepartmentState extends State<AddDepartment> {
                     ),
                   ),
                 ),
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 10.0,
+              left: 20.0,
+              right: 20,
+            ),
+            child: Text('Vertiefungsfächer vorhanden: ')
+          ),
+          Padding(
+              padding: const EdgeInsets.only(
+                left: 20.0,
+                right: 20,
+              ),
+            child: Checkbox(
+              checkColor: Colors.purple,
+              value: isChecked,
+              onChanged: (bool? value) {
+                setState(() {
+                  isChecked = value!;
+                });
+              },
+            ),
+          ),
                 Center(
                   child: IconButton(
                     icon: Icon(Icons.arrow_forward),
@@ -138,10 +161,19 @@ class _AddDepartmentState extends State<AddDepartment> {
                       store.collection('department_list').doc(textControllerDepartment.text).set({
                         'Abteilung' : textControllerDepartment.text
                       });
-                      store.collection('subject_list').doc(textControllerDepartment.text).set({
-                        'department' : textControllerDepartment.text,
-                        'subject' : []
-                      });
+                  if(isChecked==true) {
+                    store.collection('subject_list').doc(textControllerDepartment.text).set({
+                     'department': textControllerDepartment.text,
+                      'subject': [],
+                      'elective': []
+                    });
+                    }else
+                      {
+                        store.collection('subject_list').doc(textControllerDepartment.text).set({
+                          'department': textControllerDepartment.text,
+                          'subject': []
+                        });
+                      }
 
                       showDialog(
                         context: context,

@@ -3,11 +3,14 @@ import 'package:easy_dynamic_theme/easy_dynamic_theme.dart';
 import 'package:explore/screens/home_page.dart';
 import 'package:explore/utils/authentication.dart';
 import 'package:explore/widgets/AdminBereich.dart';
+import 'package:explore/widgets/Chatpage.dart';
 import 'package:explore/widgets/Fachauswahl.dart';
 import 'package:explore/widgets/MeineFaecher.dart';
+import 'package:explore/widgets/TerminErstellPage.dart';
+import 'package:explore/widgets/TerminPage.dart';
 import 'package:explore/widgets/profil.dart';
 import 'package:explore/widgets/Register.dart';
-import 'package:explore/widgets/auth_dialog.dart';
+import 'package:explore/widgets/Login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -114,8 +117,8 @@ class _TopBarContentsState extends State<TopBarContents> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(
-                        top: 10,
-                        bottom: 10,
+                        top: 2,
+                        bottom: 2,
                       right:10
                     ),
                       child: SizedBox(
@@ -123,7 +126,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                         width: screenSize.width*0.06,
 
                         child: Image.asset(
-                          'assets/images/LogoNeu.png',
+                          'assets/images/TU4SIcon.png',
                           fit: BoxFit.fill,
 
                       ),
@@ -157,7 +160,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        SizedBox(width: screenSize.width / 25),
+                        SizedBox(width: screenSize.width / 35),
                         InkWell(
                           onHover: (value) {
                             setState(() {
@@ -169,10 +172,14 @@ class _TopBarContentsState extends State<TopBarContents> {
                           onTap: () {
 
                             if(cuser!.uid.isNotEmpty) {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) => MeineFaecherPage()
-                              );
+                              Future.delayed(
+                                  Duration(milliseconds: 500),
+                                      () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) => MeineFaecherPage()
+                                    );
+                                  });
                             }else{
                               AlertDialog(
                                     title: Text('Kein User Angemeldet'),
@@ -228,7 +235,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                             ],
                           ),
                         ),
-                        SizedBox(width: screenSize.width / 25),
+                        SizedBox(width: screenSize.width / 35),
                         InkWell(
                           onHover: (value) {
                             setState(() {
@@ -240,10 +247,14 @@ class _TopBarContentsState extends State<TopBarContents> {
                           onTap: () {
 
                             if(cuser!.uid.isNotEmpty) {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) => FachauswahlPage()
-                              );
+                              Future.delayed(
+                                  Duration(milliseconds: 500),
+                                      () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) => FachauswahlPage()
+                                    );
+                                  });
                             }else{
                               _KeinUserAngemeldet();
                             }
@@ -275,7 +286,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                             ],
                           ),
                         ),
-                        SizedBox(width: screenSize.width / 25),
+                        SizedBox(width: screenSize.width / 35),
                         InkWell(
                           onHover: (value) {
                             setState(() {
@@ -285,6 +296,11 @@ class _TopBarContentsState extends State<TopBarContents> {
                             });
                           },
                           onTap: () {
+
+                            showDialog(
+                                context: context,
+                                builder: (context) => TerminPage()
+                            );
 
                           },
                           child: Column(
@@ -313,7 +329,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                             ],
                           ),
                         ),
-                        SizedBox(width: screenSize.width / 25),
+                        SizedBox(width: screenSize.width / 35),
                         InkWell(
                           onHover: (value) {
                             setState(() {
@@ -359,7 +375,58 @@ class _TopBarContentsState extends State<TopBarContents> {
                             ],
                           ),
                         ),
-                        SizedBox(width: screenSize.width / 25),
+                        SizedBox(width: screenSize.width / 35),
+                        InkWell(
+                          onHover: (value) {
+                            setState(() {
+                              value
+                                  ? _isHovering[4] = true
+                                  : _isHovering[4] = false;
+                            });
+                          },
+                          onTap: () {
+
+                            if(cuser!.uid.isNotEmpty) {
+    Future.delayed(
+    Duration(milliseconds: 500),
+    () {
+      showDialog(
+          context: context,
+          builder: (context) => Chatpage()
+      );
+    });
+                            }else{
+                              _KeinUserAngemeldet();
+                            }
+
+                          },
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Chat',
+                                style: TextStyle(
+                                  color: _isHovering[4]
+                                      ? Colors.blue[200]
+                                      : Colors.white,
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              Visibility(
+                                maintainAnimation: true,
+                                maintainState: true,
+                                maintainSize: true,
+                                visible: _isHovering[4],
+                                child: Container(
+                                  height: 2,
+                                  width: 15,
+                                  color: Colors.white,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: screenSize.width / 35),
                         InkWell(
                           onHover: (value) {
                             setState(() {
@@ -370,8 +437,8 @@ class _TopBarContentsState extends State<TopBarContents> {
                                 })
                               });
                               value
-                                  ? _isHovering[4] = true
-                                  : _isHovering[4] = false;
+                                  ? _isHovering[5] = true
+                                  : _isHovering[5] = false;
 
                             });
                           },
@@ -403,7 +470,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                               Text(
                                 'Administratorbereich',
                                 style: TextStyle(
-                                  color: _isHovering[4]
+                                  color: _isHovering[5]
                                       ? Colors.blue[200]
                                       : Colors.white,
                                 ),
@@ -413,7 +480,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                                 maintainAnimation: true,
                                 maintainState: true,
                                 maintainSize: true,
-                                visible: _isHovering[4],
+                                visible: _isHovering[5],
                                 child: Container(
                                   height: 2,
                                   width: 15,
@@ -432,7 +499,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                   InkWell(
                     onHover: (value) {
                       setState(() {
-                        value ? _isHovering[5] = true : _isHovering[5] = false;
+                        value ? _isHovering[6] = true : _isHovering[6] = false;
                       });
                     },
                     onTap: userEmail == null
@@ -449,7 +516,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                         ? Text(
                       'Anmelden',
                       style: TextStyle(
-                        color: _isHovering[5] ? Colors.black : Colors.white60,
+                        color: _isHovering[6] ? Colors.black : Colors.white60,
                       ),
                     )
                         : Row(
@@ -470,7 +537,7 @@ class _TopBarContentsState extends State<TopBarContents> {
                         Text(
                           name ?? userEmail!,
                             style: TextStyle(
-                            color: _isHovering[5]
+                            color: _isHovering[6]
                                 ? Colors.black
                                 : Colors.white60,
                           ),

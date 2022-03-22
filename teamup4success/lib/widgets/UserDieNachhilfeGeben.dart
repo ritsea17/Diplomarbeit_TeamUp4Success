@@ -1,14 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:explore/widgets/ChatMessage.dart';
 import 'package:explore/widgets/web_scrollbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:explore/widgets/explore_drawer.dart';
 import 'package:explore/widgets/responsive.dart';
 import 'package:explore/widgets/top_bar_contents.dart';
-import 'package:explore/screens/home_page.dart';
 
 class UserDieNachhilfeGebenPage extends StatefulWidget {
   const UserDieNachhilfeGebenPage({Key? key, required this.subject}) : super(key: key);
@@ -120,46 +119,51 @@ class _UserDieNachhilfeGebenState extends State<UserDieNachhilfeGebenPage>
                             Map lessons = {};
                             List name = [];
                             List email=[];
+                            List uid = [];
                             Map details = {};
                             List teacherAndYears= [];
+                            List givetrue = [];
+                            var snap = snapshot.data!.docs.toList();
+                            snap.forEach((element) {
+                              if(element.data().keys.contains('givePrivateLessons')) {
+                                givetrue.add(1);
+                              }
+                              else{
+                                givetrue.add(0);
+                              }
+
+                              });
                               for(int i = 0;i<snapshot.data!.docs.length-1;i++) {
-                                lessons = snapshot.data!.docs[i].get(
-                                    'givePrivateLessons');
-                                if(lessons.containsKey(widget.subject[0])){
-                                  String years=snapshot.data!.docs[i].get(
-                                      'givePrivateLessons.${widget.subject[0]}.${'providedYears'}');
-                                  print('!!getYears!!');
-                                  print(years);
-                                  print('!!getYears!!');
-                                  List s = years.split(';');
-                                  if(s.contains(widget.subject[2])){
-                                    name.add(snapshot.data!.docs[i].get(
-                                        'display_name'));
-                                    email.add(snapshot.data!.docs[i].get(
-                                        'email'));
-                                    details = snapshot.data!.docs[i].get(
-                                        'givePrivateLessons.${widget.subject[0]}');
-                                    teacherAndYears.add(details.values.toList());
+                                if(givetrue[i]==1) {
+                                  lessons = snapshot.data!.docs[i].get('givePrivateLessons');
+                                  if(snapshot.data!.docs[i].get('uid')!= cuser!.uid) {
+                                    if (lessons.containsKey(widget.subject[0])) {
+                                      String years = snapshot.data!.docs[i].get('givePrivateLessons.${widget
+                                              .subject[0]}.${'providedYears'}');
+                                      List s = years.split(';');
+                                      if (s.contains(widget.subject[2])) {
+                                        name.add(snapshot.data!.docs[i].get('display_name'));
+                                        email.add(snapshot.data!.docs[i].get('email'));
+                                        uid.add(snapshot.data!.docs[i].get('uid'));
+                                        details = snapshot.data!.docs[i].get('givePrivateLessons.${widget
+                                                .subject[0]}');
+                                        teacherAndYears.add(details.values.toList());
+                                      }
+                                    }
                                   }
-
+                                } else{
+                                  print('keine Nachhilfe');
                                 }
-                                print('in for');
-                                print(name);
-                                print(email);
-                                print(teacherAndYears);
                               };
-
-                              
-
                               return ListView.builder(
-                                itemCount: name.length ?? 1,
+                                itemCount: name.length,
                                 shrinkWrap: true,
                                 padding: EdgeInsets.only(top: 10.0),
                                 itemBuilder: (ctx, i) {
                                   return ListTile(
                                       leading: Icon(Icons.account_circle,size: 40,),
                                       title: Text(
-                                        name[i] ?? 'Keine Nachhilfe vorhanden' , style: TextStyle(
+                                        name[i]   , style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 25,
                                         fontFamily: 'Montserrat',
@@ -167,7 +171,7 @@ class _UserDieNachhilfeGebenState extends State<UserDieNachhilfeGebenPage>
                                         letterSpacing: 3,
                                       ),),
                                       subtitle: Text(
-                                       email[i] ?? 'Keine Nachhilfe vorhanden' , style: TextStyle(
+                                       email[i]  , style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 16,
                                         fontFamily: 'Montserrat',
@@ -175,15 +179,21 @@ class _UserDieNachhilfeGebenState extends State<UserDieNachhilfeGebenPage>
                                         letterSpacing: 3,
                                       ),),
                                       trailing: Text(
-                                       'Professor/in: '+teacherAndYears[i][0] ?? 'Keine Nachhilfe vorhanden' , style: TextStyle(
+                                       'Professor/in: '+teacherAndYears[i][0] , style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 20,
                                         fontFamily: 'Montserrat',
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 3,
                                       ),),
-
-
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => Messagepage(
+                                          chatman: uid[i],
+                                            chatname: name[i]
+                                        ));
+                                    }
                                   );
                                 },
                               );

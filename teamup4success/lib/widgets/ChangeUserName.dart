@@ -62,7 +62,7 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                     width: screenSize.width*0.08,
 
                     child: Image.asset(
-                      'assets/images/Logo.png',
+                      'assets/images/TU4SIcon.png',
                       fit: BoxFit.fill,
                     ),
                   ),

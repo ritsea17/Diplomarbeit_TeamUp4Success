@@ -104,12 +104,22 @@ late String sid;
           physics: ClampingScrollPhysics(),
           child: Column(
             children: [
+          Container(
+          padding: EdgeInsets.only(top: 150.0,bottom: 10.0),
+            child: Text('Alle Fächer',style: TextStyle(
+              color: Colors.black,
+              fontSize: 30,
+              fontFamily: 'Montserrat',
+              fontWeight: FontWeight.bold,
+              letterSpacing: 3,
+            ),)
+          ),
               Container(
-                  padding: EdgeInsets.only(top: 150.0,bottom: 10.0),
+                  padding: EdgeInsets.only(top: 20.0,bottom: 10.0),
                   child: RichText(
 
                     text: TextSpan(
-                      text: 'Alle Fächer',
+                      text: 'Allgemeine Fächer',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 30,
@@ -167,7 +177,104 @@ late String sid;
                         ),
                       ],
                     ),
-                  )
+                  ),
+
+              ),
+              Container(
+                padding: EdgeInsets.only(top: 20.0,bottom: 10.0),
+                child: RichText(
+
+                  text: TextSpan(
+                    text: 'Vertiefungsfächer:',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 30,
+                      fontFamily: 'Montserrat',
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 3,
+                    ),
+                    children: [
+
+                      // Use WidgetSpan instead of TextSpan, which allows you to have a child widget
+                      WidgetSpan(
+                        // Use StreamBuilder to listen on the changes of your Firestore document.
+                        child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                          stream: FirebaseFirestore.instance
+                              .collection("subject_list").where('department',isEqualTo: widget.department)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            int snap = snapshot.data!.docs.length;
+                            List s = snapshot.data!.docs.last.data().keys.toList();
+
+                            print(s);
+                            print(s.length);
+                            print(snap);
+                            if (s.length == 2) {
+                             return ListView.builder(
+                                itemCount: 1,
+                                shrinkWrap: true,
+                                padding: EdgeInsets.only(top: 10.0),
+                                itemBuilder: (ctx, i) {
+                                  return ListTile(
+                                    title: Text(
+                                      'Keine Vertiefungsfächer',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 25,
+                                        fontFamily: 'Montserrat',
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 3,
+                                      ),),
+                                  );
+                                },
+                              );
+                            } else {
+                              List document = snapshot.data!.docs
+                                  .single['elective'];
+
+                              return ListView.builder(
+                                itemCount: document.length,
+                                shrinkWrap: true,
+                                padding: EdgeInsets.only(top: 10.0),
+                                itemBuilder: (ctx, i) {
+                                  return ListTile(
+                                    title: Text(
+                                      document[i],
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 25,
+                                        fontFamily: 'Montserrat',
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 3,
+                                      ),),
+                                    trailing:
+                                    IconButton(
+                                      icon: Icon(Icons.delete),
+                                      splashColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      iconSize: 30.0,
+                                      color: Colors.red,
+                                      onPressed: () {
+                                        store.collection("subject_list").doc(
+                                            widget.department).update(
+                                            {
+                                              'elective': FieldValue
+                                                  .arrayRemove([document[i]])
+                                            });
+                                      },
+                                    ),
+
+                                  );
+                                },
+                              );
+                            }
+                          }// Get the document snapshot// Get the data in the text field
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
               ),
               FloatingActionButton(
                 onPressed: () {

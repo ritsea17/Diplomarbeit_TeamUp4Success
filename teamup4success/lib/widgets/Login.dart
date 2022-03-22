@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/screens/home_page.dart';
 import 'package:explore/utils/authentication.dart';
+import 'package:explore/widgets/ForgotPassword.dart';
+import 'package:explore/widgets/JahrgangErhoehen.dart';
 import 'package:explore/widgets/Register.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -29,8 +31,11 @@ class _AuthDialogState extends State<AuthDialog> {
   String? loginStatus;
   Color loginStringColor = Colors.green;
 
+  var snap = false;
 
    List admins=[];
+   String date="";
+   String Userid="";
 
   String? _validateEmail(String value) {
     value = value.trim();
@@ -70,6 +75,47 @@ class _AuthDialogState extends State<AuthDialog> {
 
   bool _verifyEmail(User? user) {
     return true;
+  }
+
+  void ChangeYear(){
+    List a = date.split('-');
+    int Jahr = int.parse(a[0]);
+    if(DateTime.now().year-Jahr>1){
+      if(DateTime.now().month<9){
+        int y = DateTime.now().year-1;
+        String year = y.toString();
+        String neuerJahrgang = year+'-'+'09'+'-'+'01';
+        showDialog(
+            context: context,
+            builder: (context) => Jahrgangerhoehen(newDate: neuerJahrgang)
+        );
+      }else{
+        String neuerJahrgang = DateTime.now().year.toString()+'-'+'09'+'-'+'01';
+        showDialog(
+            context: context,
+            builder: (context) => Jahrgangerhoehen(newDate: neuerJahrgang)
+        );
+      }
+    }else if((DateTime.now().year-Jahr)==1 && DateTime.now().month.toInt() >= 9){
+      String neuerJahrgang = DateTime.now().year.toString()+'-'+'09'+'-'+'01';
+      showDialog(
+          context: context,
+          builder: (context) => Jahrgangerhoehen(newDate: neuerJahrgang)
+      );
+    }else{
+      Future.delayed(
+          Duration(milliseconds: 500),
+              () {
+            Navigator.of(context).pop();
+            Navigator.of(context)
+                .pushReplacement(
+                MaterialPageRoute(
+                  fullscreenDialog: true,
+                  builder: (context) =>
+                      HomePage(),
+                ));
+          });
+    }
   }
 
   @override
@@ -116,7 +162,7 @@ class _AuthDialogState extends State<AuthDialog> {
                       width: screenSize.width*0.08,
 
                       child: Image.asset(
-                        'assets/images/LogoNeu.png',
+                        'assets/images/TU4SIcon.png',
                         fit: BoxFit.fill,
 
                       ),
@@ -276,7 +322,10 @@ class _AuthDialogState extends State<AuthDialog> {
                       ),
                       child: Text('Passwort vergessen?'),
                       onPressed: () {
-                        _auth.sendPasswordResetEmail(email: textControllerEmail.text);
+                        showDialog(
+                          context: context,
+                          builder: (context) => ForgotPassword(),
+                        );
                       }
                   ),
                 ),
@@ -315,50 +364,47 @@ class _AuthDialogState extends State<AuthDialog> {
                                 textFocusNodePassword.unfocus();
 
                               });
-                              if (_validateEmail(textControllerEmail.text) ==
-                                      null &&
-                                  _validatePassword(
-                                          textControllerPassword.text) ==
-                                      null ) {
-                                await signInWithEmailPassword(
-                                        textControllerEmail.text,
-                                        textControllerPassword.text)
+                              if (_validateEmail(textControllerEmail.text) == null &&
+                                  _validatePassword(textControllerPassword.text) == null) {
+                                await signInWithEmailPassword(textControllerEmail.text, textControllerPassword.text)
                                     .then((result) {
                                   if (result != null) {
                                     print(result);
+                                    Userid= result.uid;
+                                    print(result.uid);
                                     setState(() {
                                       loginStatus =
                                           'Du hast dich erfolgreich angemeldet!';
                                       loginStringColor = Colors.green;
+                                      snap = store.collection('users').doc(cuser!.uid).snapshots().isEmpty as bool;
 
                                     });
-
-
-
-                                        Future.delayed(
-                                            Duration(milliseconds: 500),
-                                                () {
-                                              Navigator.of(context).pop();
-                                              Navigator.of(context)
-                                                  .pushReplacement(
-                                                  MaterialPageRoute(
-                                                    fullscreenDialog: true,
-                                                    builder: (context) =>
-                                                        HomePage(),
-                                                  ));
-                                            });
-                                    var snap = store.collection('users').doc(cuser!.uid).snapshots().isEmpty;
+                                    store.collection('users').doc(cuser!.uid).get().then((value) =>{
+                                      date =value.get('updateDepartmentDate'),
+                                    }).whenComplete(() => ChangeYear());
+                                    print('vorher');
+                                    print(date);
                                     if(snap == true){
-                                      cuser.delete();
+                                      cuser!.delete();
+                                      print('user gelöscht');
                                     }
-    }
+                                    }
                                 }).catchError((error) {
                                   print('Login Error: $error');
+                                  print(Userid);
                                   setState(() {
                                     loginStatus =
-                                        'Error';
+                                    'Error';
                                     loginStringColor = Colors.red;
+
                                   });
+                                  store.collection('users').doc(Userid).get().then((value) =>{
+                                    date = value.get('updateDepartmentDate').toString(),
+                                    print(Userid)
+                                  }).whenComplete(() => ChangeYear());
+                                  print('danach');
+
+
                                 });
                               } else {
                                 setState(() {

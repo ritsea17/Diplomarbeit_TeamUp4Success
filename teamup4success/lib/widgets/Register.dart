@@ -47,6 +47,7 @@ class _AuthDialogState extends State<RegisterDialog> {
 
   List admins=[];
   List departments=[];
+  String newYear="";
 
 
   String? _validateEmail(String value) {
@@ -68,15 +69,7 @@ class _AuthDialogState extends State<RegisterDialog> {
 
     return null;
   }
-  String? _validateBenutzername(String value) {
-    value = value.trim();
-    return null;
-  }
 
-  String? _validateKlasse(String value) {
-    value = value.trim();
-    return null;
-  }
 
 
   String? _validatePassword(String value) {
@@ -159,7 +152,7 @@ class _AuthDialogState extends State<RegisterDialog> {
                       width: screenSize.width*0.08,
 
                       child: Image.asset(
-                        'assets/images/LogoNeu.png',
+                        'assets/images/TU4SIcon.png',
                         fit: BoxFit.fill,
 
                       ),
@@ -233,13 +226,6 @@ class _AuthDialogState extends State<RegisterDialog> {
                       ),
                       hintText: "xyz",
                       fillColor: Colors.white,
-                      errorText: _isEditingBenutzername
-                          ? _validateBenutzername(textControllerBenutzername.text)
-                          : null,
-                      errorStyle: TextStyle(
-                        fontSize: 12,
-                        color: Colors.redAccent,
-                      ),
                     ),
                   ),
                 ),
@@ -617,10 +603,10 @@ class _AuthDialogState extends State<RegisterDialog> {
                               setState(() {
                                 _isRegistering = true;
                               });
-                            if (_validateEmail(textControllerEmail.text) ==
-                                null && _validatePassword(textControllerPassword.text) ==
-                                null && _validateBenutzername(textControllerBenutzername.text)==null &&
-                                _validateKlasse(textControllerKlasse.text)==null) {
+                            if (_validateEmail(textControllerEmail.text)
+                                == null &&
+                                _validatePassword(textControllerPassword.text)
+                                    == null){
                               await registerWithEmailPassword(
                                   textControllerEmail.text,
                                   textControllerPassword.text)
@@ -629,16 +615,24 @@ class _AuthDialogState extends State<RegisterDialog> {
                                   print(result);
                                   setState(() {
                                     loginStatus =
-                                    'You have successfully logged in';
+                                    'Neuer Account wurde erstellt';
                                     loginStringColor = Colors.green;
 
+                                    if(DateTime.now().month<9){
+                                      int y = DateTime.now().year-1;
+                                      String year = y.toString();
+                                       newYear = year+'-'+'09'+'-'+'01';
+                                    }else{
+                                      newYear = DateTime.now().year.toString()+'-'+'09'+'-'+'01';
+                                    }
                                     store.collection("users").doc(uid).set(
                                         {
                                           'display_name' : textControllerBenutzername.text,
                                           'email' : textControllerEmail.text,
                                           'department' : abteilung,
-                                          'year' : textControllerKlasse.text,
-                                          'uid': uid.toString()
+                                          'year' : Jahrgang.toString(),
+                                          'uid': uid.toString(),
+                                          'updateDepartmentDate' : newYear
                                         });
 
                                     username = textControllerBenutzername.text;
